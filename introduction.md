@@ -1,4 +1,4 @@
-##About this Book
+## About this Book
 
 This book is designed as an introduction to building and containerizing a Ruby on Rails application. It explains common development tasks that you will encounter when building Rails applications – adding nested resources,a  JavaScript framework (Stimulus.js), Bootstrap CSS  styles, and  Sidekiq and Redis to process background jobs. Once you have an application ready for  development, the  last  part  of  this  book will  guide you  through containerizing your Rails application for continued development. 
 
