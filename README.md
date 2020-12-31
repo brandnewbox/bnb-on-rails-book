@@ -9,3 +9,4 @@ Many chapters of this book are updated versions of Kathleen Juell's [_Rails on C
 
 * [About Brand New Box](about.html)
 * [Introduction](introduction.html)
+* [Creating a New Rails Project](rails-new.html)
