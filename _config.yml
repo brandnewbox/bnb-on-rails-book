@@ -1,1 +1,5 @@
+name: The Brand New Box Rails Book
+description: Getting started with Rails for the benefit of everyone
+url: "https://brandnewbox.github.io/bnb-on-rails-book/"
+markdown: kramdown
 theme: jekyll-theme-cayman
