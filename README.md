@@ -14,7 +14,7 @@ Many chapters of this book are updated versions of Kathleen Juell's [_Rails on C
 
 Consistent development environments are critical at Brand New Box. Here is how we do it!
 
-* [Virtual Machine](#)
+* [Virtual Machine](./virtual_machine.html)
 * [Docker Compose and BNB Ruby](#)
 * [Dip](#)
 
