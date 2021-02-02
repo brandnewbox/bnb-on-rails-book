@@ -16,7 +16,7 @@ Consistent development environments are critical at Brand New Box. Here is how w
 
 * [Virtual Machine](#)
 * [Docker Compose and BNB Ruby](#)
-* [Dip](#)
+* [Dip](./dip.html)
 
 ## Rails Basics
 
