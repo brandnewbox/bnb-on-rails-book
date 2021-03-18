@@ -1,15 +1,15 @@
 # Step 1 — Creating an Empty Container
 
-We Are going to house our Rails Application within a container, so in order to do this, we must first create it! On your local machine, make an empty directory.
+We are going to house our Rails Application within a container, so in order to do this, we must first create it! On your local machine, make an empty directory.
 
 ```
 mkdir bnb-library
 cd bnb-library
 ```
 
-Instead of having to manage the versions of multiple different dependancies for your application such as *Ruby*, *Rails*, and *Postgres*, we maintain our own set of images that are:
+Instead of having to manage the versions of multiple different dependancies for your application such as *Ruby*, and *Postgres*, we maintain our own set of images that are:
 - Based on Ruby
-- Have PostgreSQL installed (you might opt for mysql-client)
+- Have PostgreSQL Client installed (you might opt for mysql-client)
 - Have NodeJS installed (for compiling assets)
 - There is some configuration of bundler so that it will install our gems in the `/bundle` directory.
 
@@ -21,7 +21,6 @@ services:
   app:    
     image: brandnewbox/bnb-ruby:2.7-postgresql
     command: bundle exec puma -C config/puma.rb
-    env_file: .docker-development-vars
     volumes:
       - .:/app:cached
       - bundle_cache:/usr/local/bundle
@@ -40,13 +39,6 @@ services:
 volumes:
   bundle_cache:
   my_dbdata:
-```
-
-And a corresponding environment variables file called `.docker-development-vars` filled with the following vars that will make your development life easier:
-
-```
-SECRET_KEY_BASE=4dff85262e4bb057a9f067efd9774febb8ebb8079ede34263bfe10642382841b29663f042ec8350c0be8f54a8804d125fb7966e962130acc084fd204f89f0a2ec600
-DATABASE_URL=postgres://postgres:39dkdk3f93kkd93k20dl201kd83@postgres:5432
 ```
 
 Now let's bash into this container
@@ -91,36 +83,41 @@ You will see a good deal of output telling you what Rails is creating for your n
 
 We are going to want to interact with our app in the browser, but first, we must setup our database.
 
-In our file titled `.docker-development-vars.rb` we added a *DATABASE_URL* which is going to tell our rails application a few things. Here is the breakdown...
+We are going to add a *url* to our `database.yml` file which is going to tell our rails application a few things. Here is the breakdown...
 ```
 postgres://DATABASE_USERNAME:DATABASE_PASSWORD@DATABASE_HOST:PORT/DATABASE_NAME
 ```
-This won't be any help to us if we don't tell our application to use this variable, so let's head over to `database.yml` and under `development` we will add the *DATABASE_URL* environment variable.
-
+Under `development` we will add
 ```
 development:
   <<: *default
   database: bnb_library_development
-  url: <%= ENV['DATABASE_URL'] %>
+  url: postgres://postgres:39dkdk3f93kkd93k20dl201kd83@postgres:5432
 ```
-Now setup and migrate the database
+And `test`
 ```
-dip rake db:setup
-dip rake db:migrate
+test:
+  <<: *default
+  database: bnb_library_test
+  url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:39dkdk3f93kkd93k20dl201kd83@postgres:5432" } %>
 ```
-You can expect an output similar to 
-```
-Starting bnb-library_postgres_1 ... done
-Running via Spring preloader in process 19
 
-Created database 'bnb_library_development'
-/app/db/schema.rb doesn't exist yet. Run `bin/rails db:migrate` to create it, then try again.
-```
-This is because we have not created any tables or corresponding migrations... yet! For now, let's start your application's server and see the landing page rails has created for us.
+Now to setup the database we will need to start your server, as your postgresql service is tied in directly to the app
 
 ```
 dip up
 ```
+Then run the setup command in a seperate terminal
+```
+dip rake db:setup
+```
+You can expect an output similar to 
+```
+Running via Spring preloader in process 19
+Created database 'bnb_library_development'
+Created database 'bnb_library_test'
+```
+Now let's start your application's server and see the landing page rails has created for us.
 
 Navigate to `http://localhost:3000` in your browser to see the magic.
 
