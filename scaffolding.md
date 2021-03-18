@@ -134,64 +134,63 @@ end
 ```
 The controller is responsible for managing how information gets fetched and passed to its associated model, and how it gets associated with particular views. As you can see, our `books` controller includes a series of methods that map roughly to standard CRUD operations. However, there are more methods than CRUD functions, to enable efficiency in the case of errors.
 
-For example, consider the create method:
-   ow the white list through.
-    def shark_params
-      params.require(:shark).permit(:name, :facts)
-    end
-end
-   
-  If a new instance of the Shark class is successfully saved, redirect_to will spawn a new request that is then directed to the controller. This will be a GE T request, and it will be handled by the show method, which will show the user the shark they've just added.
-   ~/sharkapp/app/controllers/sharks_controller.rb
+For example, consider the `create` method:
+```
  .. .
-def create
-    @shark = Shark.new(shark_params)
+  def create
+    @book = Book.new(book_params)
+
     respond_to do |format|
-      if @shark.save
-        format.html { redirect_to @shark, notice: 'Shark was s
-uccessfully created.' }
-        format.json { render :show, status: :created, locatio
-n: @shark }
+      if @book.save
+        format.html { redirect_to @book, notice: "Book was successfully created." }
+        format.json { render :show, status: :created, location: @book }
       else
-        format.html { render :new }
-        format.json { render json: @shark.errors, status: :unp
-rocessable_entity }
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: @book.errors, status: :unprocessable_entity }
       end
-end end
+    end
+  end
 .. .
- 
-If there is a failure, then Rails will render the
-erb template again rather than making another request to the router, giving users another chance to submit their data.
-In addition to the sharks controller, Rails has given us a template for an ind ex view, which maps to the index method in our controller. We will use this as the root view for our application, so it's worth taking a look at it.
+``` 
+If a new instance of the Book class is successfully saved, `redirect_to` will spawn a new request that is then directed to the controller. This will be a `GET` request, and it will be handled by the `show` method, which will show the user the `book` they've just added.
+
+If there is a failure, then Rails will render the `app/views/sharks/new.html.erb` template again rather than making another request to the router, giving users another chance to submit their data.
+
+In addition to the books controller, Rails has given us a template for an `index` view, which maps to the `index` method in our controller. We will use this as the root view for our application, so it's worth taking a look at it.
+
 Type the following to output the file:
-    cat app/views/sharks/index.html.erb
-   app/views/sharks/new.html.
-     
+```
+cat app/views/books/index.html.erb
+```
+``` 
 Output
-   <p id="notice"><%= notice %></p>
-<h1>Sharks</h1>
+<p id="notice"><%= notice %></p>
+
+<h1>Books</h1>
+
 <table>
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Facts</th>
       <th colspan="3"></th>
     </tr>
   </thead>
+
   <tbody>
-    <% @sharks.each do |shark| %>
+    <% @books.each do |book| %>
       <tr>
-        <td><%= shark.name %></td>
-        <td><%= shark.facts %></td>
-        <td><%= link_to 'Show', shark %></td>
-        <td><%= link_to 'Edit', edit_shark_path(shark) %></td>
-        <td><%= link_to 'Destroy', shark, method: :delete, dat
-a: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Show', book %></td>
+        <td><%= link_to 'Edit', edit_book_path(book) %></td>
+        <td><%= link_to 'Destroy', book, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
- 
-The index view iterates through the instances of our Shark class, which have been mapped to the sharks table in our database. Using ERB templating, the view outputs each field from the table that is associated with an individual shark instance: name and facts .
+</table>
+
+<br>
+```
+The `index` view iterates through the instances of our `Book` class, which have been mapped to the books table in our database. Using [ERB templating](https://ruby-doc.org//stdlib-1.9.3/libdoc/erb/rdoc/ERB.html), the view outputs each field from the table that is associated with an individual book instance: 
+## update this
+name and facts.
 The view then uses the link_to helper to create a hyperlink, with the provided string as the text for the link and the provided path as the
 destination. The paths themselves are made possible through the helpers that became available to us when we defined the sharks resourceful route with the rails generate scaffold command.
 In addition to looking at our index view, we can also take a look at the new view to see how Rails uses partials in views. Type the following to output the app/views/sharks/new.html.erb template:
