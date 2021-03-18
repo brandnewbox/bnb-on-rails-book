@@ -27,8 +27,19 @@ services:
       - bundle_cache:/usr/local/bundle
     ports:
       - "3000:3000"
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:11-alpine
+    environment:
+      - POSTGRES_PASSWORD=39dkdk3f93kkd93k20dl201kd83
+    ports:
+      - '5432:5432'
+    volumes:
+      - my_dbdata:/var/lib/postgresql/data
 volumes:
   bundle_cache:
+  my_dbdata:
 ```
 
 And a corresponding environment variables file called `.docker-development-vars` filled with the following vars that will make your development life easier:
