@@ -1,4 +1,6 @@
-Step 4 — Creating the Application Root View and Testing Functionality
+## Step 4 — Creating the Application Root View and Testing Functionality
+
+
 Ideally, you want the landing page of your application to map to the application's root, so users can immediately get a sense of the application's purpose.
 There are a number of ways you could handle this: for example, you could create a Welcome controller and an associated index view, which would
                  <%= form.submit %>

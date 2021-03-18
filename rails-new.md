@@ -1,77 +1,118 @@
-Step 2 — Creating a New Rails Project
-With our database installed, we can create a new Rails project and look at some of the default boilerplate code that Rails gives us with the rails new command.
-Create a project called sharkapp with the following command:
-You will see a good deal of output telling you what Rails is creating for your new project. The output below highlights some significant files, directories, and commands:
-     rails new sharkapp
+# Step 1 — Creating an Empty Container
 
-Output
+We Are going to house our Rails Application within a container, so in order to do this, we must first create it! On your local machine, make an empty directory.
 
-```bash
-create
-. ..
-create Gemfile . ..
-create app
-.. .
-create app/controllers/application_controller.rb .. .
-create app/models/application_record.rb
-.. .
-create app/views/layouts/application.html.erb .. .
-create config
-create config/routes.rb
-create config/application.rb
-.. .
-create config/environments
-create config/environments/development.rb
-create config/environments/production.rb
-create config/environments/test.rb
-.. .
-create config/database.yml
-create db
-create db/seeds.rb
-.. .
- 
- run bundle install .. .
-Bundle complete! 18 Gemfile dependencies, 78 gems now installe
-d.
-Use `bundle info [gemname]` to see where a bundled gem is inst
-alled.
-.. .
-* bin/rake: Spring inserted * bin/rails: Spring inserted
- Gemfile
-    app/models/application_record.rb
-              app/views/layouts/application.html.erb    config
-config/environments
-development production test config/database.yml
-app/controllers/application_c
-      ontroller.rb
-    config/r
-  outes.rb
-     config/ap
-  plication.rb
 ```
-The output highlighted here tells you that Rails has created the following: - : This file lists the gem dependencies for your application. A gem is a Ruby software package, and a Gemfile allows you to manage your project's software needs. - app: The app directory is where your main application code lives. This includes the models, controllers, views, assets, helpers, and mailers that make up the application itself. Rails gives you some application-level boilerplate for the MCV model to start out in files
-like ,
-: Your application's route declarations live in this file. -
-: General settings for your application components are located in this file. - : This directory is where configuration settings for your environments live. Rails includes three environments by default: , , and . - : Database configuration settings live in this file, which is broken into four
-. - : This directory contains your application's configuration settings: -
-, and
+mkdir bnb-library
+cd bnb-library
+```
 
-  sections: default, development, production, and test. Thanks to the Gemfile that came with the rails new command, which included the sqli te3 gem, our config/database.yml file has its adapter parameter set to sq
-already, specifying that we will use an SQLite database with this application. - db: This folder includes a directory for database migrations called migrate, along with the schema.rb and seeds.rb files. schema.db contains information about your database, while seeds.rb is where you can place seed data for the database.
-Finally, Rails runs the bundle install command to install the dependencies listed in your Gemfile .
-Once everything is set up, navigate to the sharkapp directory:
-You can now start the Rails server to ensure that your application is working, using the rails server command. If you are working on your local machine, type:
-Rails binds to localhost by default, so you can now access your application by navigating your browser to locahost:3000, where you will see the following image:
-             lite3
-            cd sharkapp
-    rails server
-  
-   If you are working on a development server, first ensure that connections are allowed on port 3000 :
-Then start the server with the --binding flag, to bind to your server IP:
-Navigate to http://your_server_ip:3000 in your browser, where you will see the Rails welcome message.
-Once you have looked around, you can stop the server with CTRL+C .
-   sudo ufw allow 3000
-   rails server --binding=your_server_ip
-   Rails Landing Page
-  
- With your application created and in place, you are ready to start building from the Rails boilerplate to create a unique application.
+Instead of having to manage the versions of multiple different dependancies for your application such as *Ruby*, *Rails*, and *Postgres*, we maintain our own set of images that are:
+- Based on Ruby
+- Have PostgreSQL installed (you might opt for mysql-client)
+- Have NodeJS installed (for compiling assets)
+- There is some configuration of bundler so that it will install our gems in the `/bundle` directory.
+
+In your new directory make a `docker-compose.yml` file and paste in:
+
+```
+version: "3"
+services:
+  app:    
+    image: brandnewbox/bnb-ruby:2.7-postgresql
+    command: bundle exec puma -C config/puma.rb
+    env_file: .docker-development-vars
+    volumes:
+      - .:/app:cached
+      - bundle_cache:/usr/local/bundle
+    ports:
+      - "3000:3000"
+volumes:
+  bundle_cache:
+```
+
+And a corresponding environment variables file called `.docker-development-vars` filled with the following vars that will make your development life easier:
+
+```
+SECRET_KEY_BASE=4dff85262e4bb057a9f067efd9774febb8ebb8079ede34263bfe10642382841b29663f042ec8350c0be8f54a8804d125fb7966e962130acc084fd204f89f0a2ec600
+DATABASE_URL=postgres://postgres:39dkdk3f93kkd93k20dl201kd83@postgres:5432
+```
+
+Now let's bash into this container
+```
+dip run bash
+
+# output
+
+Creating network "bnb-library_default" with the default driver
+Creating volume "bnb-library_bundle_cache" with default driver
+
+bash-5.1#
+```
+YAY! You are now at a bash terminal inside the container you just created.
+
+## Step 2 — Creating a New Rails Project
+
+Let's install rails and setup a new application. We'll start by going into the root folder to make a app named *bnb-library*. Then we will move the files into their final resting place in `/app`.
+
+```
+# from within your bash terminal
+
+cd ..
+gem install rails
+rails new bnb-library --database=postgresql
+mv bnb-library/* app
+exit
+```
+
+You will see a good deal of output telling you what Rails is creating for your new project. We are going to highlight some of the significant files, directories, and commands that you can find in the output of running `rails new`:
+
+- *gemfile* : This file lists the gem dependencies for your application. A gem is a Ruby software package, and a Gemfile allows you to manage your project's software needs. 
+- *app*: The app directory is where your main application code lives. This includes the models, controllers, views, assets, helpers, and mailers that make up the application itself. Rails gives you some application-level boilerplate for the MCV model to start out in files like `app/models/application_record.rb`, `app/controllers/application_controller.rb`, and `app/views/layouts/application.html.erb`.
+- *config*: This directory contains your application's configuration settings.
+- *config/routes*: Your application's route declarations live in this file.
+- *config/application.rb*: General settings for your application components are located in this file. 
+- *config/environments*: This directory is where configuration settings for your environments live. Rails includes three environments by default: `development`, `test`, and `production`. 
+- *config/database*: Database configuration settings live in this file, which is broken into four sections: `default`, `development`, `production`, and `test`. Thanks to the Gemfile that came with the `rails new bnb-library --database=postgresql`, which included the `pg` gem, our `config/database.yml` file has its adapter parameter set to postgresql already, specifying that we will use an postgresql database with this application. 
+- *db*: This folder includes a directory for database migrations called migrate, along with the `schema.rb` and `seeds.rb` files. `schema.db` contains information about your database, while `seeds.rb` is where you can place seed data for the database.
+
+## Step 3 - Starting Your Application
+
+We are going to want to interact with our app in the browser, but first, we must setup our database.
+
+In our file titled `.docker-development-vars.rb` we added a *DATABASE_URL* which is going to tell our rails application a few things. Here is the breakdown...
+```
+postgres://DATABASE_USERNAME:DATABASE_PASSWORD@DATABASE_HOST:PORT/DATABASE_NAME
+```
+This won't be any help to us if we don't tell our application to use this variable, so let's head over to `database.yml` and under `development` we will add the *DATABASE_URL* environment variable.
+
+```
+development:
+  <<: *default
+  database: bnb_library_development
+  url: <%= ENV['DATABASE_URL'] %>
+```
+Now setup and migrate the database
+```
+dip rake db:setup
+dip rake db:migrate
+```
+You can expect an output similar to 
+```
+Starting bnb-library_postgres_1 ... done
+Running via Spring preloader in process 19
+
+Created database 'bnb_library_development'
+/app/db/schema.rb doesn't exist yet. Run `bin/rails db:migrate` to create it, then try again.
+```
+This is because we have not created any tables or corresponding migrations... yet! For now, let's start your application's server and see the landing page rails has created for us.
+
+```
+dip up
+```
+
+Navigate to `http://localhost:3000` in your browser to see the magic.
+
+![Hello Rails](images/hello-rails.png)
+
+### Congratulations, you have built a Rails app inside of a container!
