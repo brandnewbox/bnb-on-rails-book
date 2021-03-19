@@ -7,8 +7,10 @@ Our `generate scaffold` command will include the name of our model and the field
          
 Type the following command to generate a `Book` model, controller, and associated views:
 ```
-dip rails generate scaffold Book
+dip rails generate scaffold Book title:string description:text price:float subject_id:integer
 ```
+With `name:string`, `price:float`, `subject_id:integer`, and `description:text` we are giving Rails information about the fields we would like in our database table and the type of data they should accept.
+
 When you type this command, you will again see a long list of output that explains everything Rails is generating for you. The output below highlights some of the more significant things for our setup:
 
 ```
@@ -47,7 +49,21 @@ create      app/assets/stylesheets/books.scss
 invoke  scss
 create    app/assets/stylesheets/scaffolds.scss
 ```
-Rails has created the model at `app/models/book.rb` and a database migration to go with it: `db/migrate/20210318152156_create_books.rb`. The timestamp on your migration file will differ from what you see here.
+Rails has created the model at `app/models/book.rb` and a database migration to go with it: `db/migrate/20210318152156_create_books.rb`. The timestamp on your migration file will differ from what you see here. You can see the fields we included in our initial call of `rails generate scaffold`. Let's update the title column with a few constraints.
+```
+create_table :books do |t|
+  t.string :title, :string, limit: 32, null: false
+  t.text :description
+  t.float :price
+  t.integer :subject_id
+
+  t.timestamps
+end
+```
+`limit: 32` specifies that we want a max limit of 32 characters on our title, and `null: false` that a `book`record *must* have a title in order to be valid. To create the `Book` table run
+```
+dip rails db:migrate
+```
 
 It has also created a controller, `app/controllers/book_controller.rb` , as well as the views associated with our application's CRUD operations, collected under `app/views/books`. Among these views is a partial, `_form.html.erb`, that contains code used across views.
  
@@ -163,7 +179,6 @@ Type the following to output the file:
 cat app/views/books/index.html.erb
 ```
 ``` 
-Output
 <p id="notice"><%= notice %></p>
 
 <h1>Books</h1>
@@ -171,6 +186,10 @@ Output
 <table>
   <thead>
     <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Price</th>
+      <th>Subject</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -178,6 +197,10 @@ Output
   <tbody>
     <% @books.each do |book| %>
       <tr>
+        <td><%= book.title %></td>
+        <td><%= book.description %></td>
+        <td><%= book.price %></td>
+        <td><%= book.subject_id %></td>
         <td><%= link_to 'Show', book %></td>
         <td><%= link_to 'Edit', edit_book_path(book) %></td>
         <td><%= link_to 'Destroy', book, method: :delete, data: { confirm: 'Are you sure?' } %></td>
@@ -187,49 +210,71 @@ Output
 </table>
 
 <br>
+
+<%= link_to 'New Book', new_book_path %>
 ```
-The `index` view iterates through the instances of our `Book` class, which have been mapped to the books table in our database. Using [ERB templating](https://ruby-doc.org//stdlib-1.9.3/libdoc/erb/rdoc/ERB.html), the view outputs each field from the table that is associated with an individual book instance: 
-## update this
-name and facts.
-The view then uses the link_to helper to create a hyperlink, with the provided string as the text for the link and the provided path as the
-destination. The paths themselves are made possible through the helpers that became available to us when we defined the sharks resourceful route with the rails generate scaffold command.
-In addition to looking at our index view, we can also take a look at the new view to see how Rails uses partials in views. Type the following to output the app/views/sharks/new.html.erb template:
-              cat app/views/sharks/new.html.erb
- </table>
-<br>
-<%= link_to 'New Shark', new_shark_path %>
-   
-    Though this template may look like it lacks input fields for a new shark entry, the reference to render 'form' tells us that the template is pulling in the _form.html.erb partial, which extracts code that is repeated across views.
-Looking at that file will give us a full sense of how a new shark instance gets created:
-    cat app/views/sharks/_form.html.erb
-Output
- <h1>New Shark</h1>
-<%= render 'form', shark: @shark %>
-<%= link_to 'Back', sharks_path %>
- 
-Output
-   <%= form_with(model: shark, local: true) do |form| %>
-  <% if shark.errors.any? %>
+The `index` view iterates through the instances of our `Book` class, which have been mapped to the books table in our database. Using [ERB templating](https://ruby-doc.org//stdlib-1.9.3/libdoc/erb/rdoc/ERB.html), the view outputs each field from the table that is associated with an individual book instance: `title`, `description`, `price`, and `subject`.
+
+The view then uses the [link_to](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/UrlHelper.html#method-i-link_to) helper to create a hyperlink, with the provided string as the text for the link and the provided path as the
+destination. The paths themselves are made possible through the [helpers](https://guides.rubyonrails.org/routing.html#path-and-url-helpers) that became available to us when we defined the `books` resourceful route with the `rails generate scaffold` command.
+In addition to looking at our `index` view, we can also take a look at the new view to see how Rails uses partials in views. Type the following to output the `app/views/books/new.html.erb` template:
+```
+cat app/views/books/new.html.erb
+```
+```
+<h1>New Book</h1>
+
+<%= render 'form', book: @book %>
+
+<%= link_to 'Back', books_path %>
+``` 
+Though this template may look like it lacks input fields for a new book entry, the reference to `render 'form'` tells us that the template is pulling in the `_form.html.erb` partial, which extracts code that is repeated across views.
+
+Looking at that file will give us a full sense of how a new book instance gets created:
+```
+cat app/views/books/_form.html.erb
+```
+```
+<%= form_with(model: book) do |form| %>
+  <% if book.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(shark.errors.count, "error") %> prohib
-ited this shark from being saved:</h2>
+      <h2><%= pluralize(book.errors.count, "error") %> prohibited this book from being saved:</h2>
+
       <ul>
-      <% shark.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
+        <% book.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
       </ul>
     </div>
   <% end %>
+
   <div class="field">
-    <%= form.label :name %>
-    <%= form.text_field :name %>
-</div>
-  <div class="field">
-    <%= form.label :facts %>
-    <%= form.text_area :facts %>
+    <%= form.label :title %>
+    <%= form.text_field :title %>
   </div>
+
+  <div class="field">
+    <%= form.label :description %>
+    <%= form.text_area :description %>
+  </div>
+
+  <div class="field">
+    <%= form.label :price %>
+    <%= form.text_field :price %>
+  </div>
+
+  <div class="field">
+    <%= form.label :subject_id %>
+    <%= form.number_field :subject_id %>
+  </div>
+
   <div class="actions">
- 
-This template makes use of the form_with form helper. Form helpers are designed to facilitate the creation of new objects from user input using the fields and scope of particular models. Here, form_with takes model: shark as an argument, and the new form builder object that it creates has field inputs that correspond to the fields in the sharks table. Thus users have form fields to enter both a shark name and shark facts .
-Submitting this form will create a JSON response with user data that the rest of your application can access by way of the params method, which creates a ActionController::Parameters object with that data.
-Now that you know what rails generate scaffold has produced for you, you can move on to setting the root view for your application.
+    <%= form.submit %>
+  </div>
+<% end %>
+```
+This template makes use of the [form_with](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/FormHelper.html#method-i-form_with) [form helper](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/FormHelper.html). Form helpers are designed to facilitate the creation of new objects from user input using the fields and scope of particular models. Here, `form_with` takes `model: book` as an argument, and the new form builder object that it creates has field inputs that correspond to the fields in the `books` table. Thus users have form fields to enter a book title, description, price, and subject.
+
+Submitting this form will create a JSON response with user data that the rest of your application can access by way of the [params method](https://api.rubyonrails.org/classes/ActionController/Parameters.html), which creates a `ActionController::Parameters` object with that data.
+
+Now that you know what `rails generate scaffold` has produced for you, you can move on to setting the root view for your application.
