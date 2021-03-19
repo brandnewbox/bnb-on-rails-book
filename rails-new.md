@@ -87,14 +87,14 @@ We are going to add a *url* to our `database.yml` file which is going to tell ou
 ```
 postgres://DATABASE_USERNAME:DATABASE_PASSWORD@DATABASE_HOST:PORT/DATABASE_NAME
 ```
-Under `development` we will add
+Under `development` we will add the appropriate configuration to point Rails at the Postgres service we have setup in our `docker-compose.yml` file.
 ```
 development:
   <<: *default
   database: bnb_library_development
   url: postgres://postgres:39dkdk3f93kkd93k20dl201kd83@postgres:5432
 ```
-And `test`
+The `test` environment will use the same database information on your local machine. But we use `ENV.fetch` to allow for the value to be overridden with an environment variable. This comes in handy when running tests elsewhere, i.e. CircleCI or a similar CI/CD service.
 ```
 test:
   <<: *default
@@ -102,14 +102,10 @@ test:
   url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:39dkdk3f93kkd93k20dl201kd83@postgres:5432" } %>
 ```
 
-Now to setup the database we will need to start your server, as your postgresql service is tied in directly to the app
+Then run the setup command. This will spin up an instance of the `app` container to run the command in (as well as an instance of the `postgres` service that the `app` depends on).
 
 ```
-dip up
-```
-Then run the setup command in a seperate terminal
-```
-dip rake db:setup
+dip rails db:setup
 ```
 You can expect an output similar to 
 ```
@@ -118,7 +114,9 @@ Created database 'bnb_library_development'
 Created database 'bnb_library_test'
 ```
 Now let's start your application's server and see the landing page rails has created for us.
-
+```
+dip up
+```
 Navigate to `http://localhost:3000` in your browser to see the magic.
 
 ![Hello Rails](images/hello-rails.png)
