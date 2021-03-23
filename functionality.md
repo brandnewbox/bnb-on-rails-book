@@ -1,95 +1,82 @@
 ## Step 4 — Creating the Application Root View and Testing Functionality
-
-
 Ideally, you want the landing page of your application to map to the application's root, so users can immediately get a sense of the application's purpose.
-There are a number of ways you could handle this: for example, you could create a Welcome controller and an associated index view, which would
-                 <%= form.submit %>
-  </div>
-<% end %>
-  
- index
-   config/route
-   config/routes.rb                 nano
-  nano config/routes.rb
- ~/sharkapp/config/routes.rb
-  Rails.application.routes.draw do
-  resources :sharks
-  # For details on the DSL available within this file, see htt
-p://guides.rubyonrails.org/routing.html
-end
-   http://localh
-     ost:3000
- http://your_server_ip:3000
- index
-  give users a generic landing page that could also link out to different parts of the application. In our case, however, having users land on our
-sharks view will be enough of an introduction to the application's purpose for now.
-To set this up, you will need to modify the routing settings in
-s.rb to specify the root of the application.
-Open for editing, using or your favorite editor:
+
+There are a number of ways you could handle this: for example, you could create a `Welcome` controller and an associated `index` view, which would give users a generic landing page that could also link out to different parts of the application. In our case, however, having users land on our books `index` view will be enough of an introduction to the application's purpose for now.
+
+To set this up, you will need to modify the routing settings in `config/routes.rb` to specify the root of the application.
+Open for editing, using `nano`.
+```
+nano config/routes.rb
+```
 The file will look like this:
- Without setting something more specific, the default view at
-or will be the default Rails
-welcome page.
-In order to map the root view of the application to the view of the sharks controller, you will need to add the following line to the file:
-
-    Now, when users navigate to your application root, they will see a full listing of sharks, and have the opportunity to create a new shark entry, look at existing entries, and edit or delete given entries.
-Save the file and exit your editor when you are finished editing. If you used nano to edit the file, you can do so by pressing CTRL+X , Y , then ENTER
-You can now run your migrations with the following command:
-You will see output confirming the migration.
-Start your Rails server once again. If you are working locally, type:
-On a development server, type:
-     rails db:migrate
-  rails s
-~/sharkapp/config/routes.rb
- Rails.application.routes.draw do
-  resources :sharks
-  root 'sharks#index'
-  # For details on the DSL available within this file, see htt
-p://guides.rubyonrails.org/routing.html
+```
+Rails.application.routes.draw do
+  resources :books
+  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end
- 
- rails s --binding=your_server_ip
-    localhost:3000
-http://your_se
-   rver_ip:3000
-     Application Landing Page
-  sharks/new
-  Navigate to if you are working locally, or
-if you are working on a development server. Your application landing page will look like this:
-To create a new shark, click on the New Shark link at the bottom of the page, which will take you to the route:
+```
+ Without setting something more specific, the default view at `http://localhost:3000` will be the default Rails welcome page.
 
-    Let's add some demo information to test our application. Input “Great White” into the Name field and “Scary” into the Facts field:
- Create New Shark
- 
-   Click on the Create button to create the shark.
-This will direct you to the show route, which, thanks to the before_action filter, is set with the set_shark method, which grabs the id of the shark we've just created:
-    Add Great White Shark
-  
-  ~/sharkapp/app/controllers/sharks_controller.rb
-   class SharksController < ApplicationController
-before_action :set_shark, only: [:show, :edit, :update, :des
-troy] .. .
-def show end
-.. .
-  private
-    # Use callbacks to share common setup or constraints betwe
-en actions.
-    def set_shark
-@shark = Shark.find(params[:id]) end
-.. .
+In order to map the root view of the application to the view of the books controller, you will need to add the following line to the file:
+```
+Rails.application.routes.draw do
+  resources :books
 
-   You can test the edit function now by clicking Edit on your shark entry. This will take you to the edit route for that shark:
-  Show Shark
-   
-  Change the facts about the Great White to read “Large” instead of “Scary” and click Update Shark. This will take you back to the show route:
-    Edit Shark
-   
-  Finally, clicking Back will take you to your updated index view:
-    New Index View
-  Updated Shark
-   
+  root 'books#index'
+  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+end
+```
+Now, when users navigate to your application root, they will see a full listing of books, and have the opportunity to create a new book entry, look at existing entries, and edit or delete given entries.
+
+Save the file and exit your editor when you are finished editing. You can do so by pressing `CTRL+X `, `Y`, then `ENTER`.
+
+Start your Rails server once again
+```
+dip up
+```
+
+Your application landing page will look like this:
+![Homepage](images/homepage.png)
+
+To create a new book, click on the *New Book* link at the bottom of the page, which will take you to the `book/new` route:
+![New Book](images/new-book.png)
+
+Let's add some demo information to test our application. Input “A Walk in The Park” into the *Title* field, “A book of stories” into the *Description* field, 10 as a *Price*, and we will leave the subject blank for now:
+
+Click on the Create button to create the book.
+
+This will direct you to the `show` route, which, thanks to the `before_action` filter, is set with the `set_book` method, which grabs the id of the book we've just created:
+```
+class BooksController < ApplicationController
+  before_action :set_book, only: %i[ show edit update destroy ]
+
+  ...
+
+  # GET /books/1 or /books/1.json
+  def show
+  end
+ 
+  ...
+
+private
+  # Use callbacks to share common setup or constraints between actions.
+  def set_book
+    @book = Book.find(params[:id])
+  end
+```
+![Created Book](images/created-book.png)
+
+You can test the edit function now by clicking *Edit* on your book entry. This will take you to the edit route for that book:
+![Edit Book](images/edit-book.png)
+Change the description for _A Walk in The Park_ to read “A summer day” instead and click *Update Book*. This will take you back to the `show` route:
+![Update Book](images/update-book.png)
+Finally, clicking *Back* will take you to your updated `index` view:
+![Index Book](images/index-book.png)
+
 Now that you have tested your application's basic functionality, you can add some validations and security checks to make everything more secure.
-Step 5 — Adding Validations
+
+## Step 5 — Adding Validations
+
 Your shark application can accept input from users, but imagine a case where a user attempts to create a shark without adding facts to it, or creates an entry for a shark that's already in the database. You can create mechanisms to check data before it gets entered into the database by adding validations to your models. Since your application's logic is located in its models, validating data input here makes more sense than doing so elsewhere in the application.
 Note that we will not cover writing validation tests in this tutorial, but you can find out more about testing by consulting the Rails documentation.
 If you haven't stopped the server yet, go ahead and do that by typing
@@ -130,7 +117,8 @@ Click on New Shark. In the form, add “Great White” to the Name field and “
 Now, let's see if we can check our other validation. Click Back to return to the homepage, and then New Shark once again. In the new form, enter “Tiger Shark” in the Name field, and leave Facts blank. Clicking Create Shark will trigger the following warning:
 
   With these changes, your application has some validations in place to ensure consistency in the data that's saved to the database. Now you can turn your attention to your application's users and defining who can modify application data.
-Step 6 — Adding Authentication
+
+## Step 6 — Adding Authentication
 With validations in place, we have some guarantees about the data that's being saved to the database. But what about users? If we don't want any and all users adding to the database, then we should add some authentication measures to ensure that only permitted users can add sharks. In order to do this, we'll use the http_basic_authenticate_with method, which will allow us to create a username and password combination to authenticate users.
    Fact Presence Warning
    
