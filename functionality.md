@@ -143,7 +143,7 @@ To authenticate users, we'll use a hardcoded username and password with the `htt
 
 ```
 class ApplicationController < ActionController::Base
-  http_basic_authenticate_with name: 'sammy', password: 'shar k', except: [:index, :show]
+  http_basic_authenticate_with name: 'sammy', password: 'wammy', except: [:index, :show]
 end
 ```
 In addition to supplying the username and password here, we've also restricted authentication by specifying the routes where it should *not* be required: `index` and `show` . Another way of accomplishing this would have been to write only: `[:create, :update, :destroy]`. This way, all users will be able to look at all of the books and read descriptions of the books. When it comes to modifying site content, however, users will need to prove that they have access.
