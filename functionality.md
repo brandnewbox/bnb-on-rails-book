@@ -126,50 +126,44 @@ Now, let's see if we can check our other validation. Click *Back* to return to t
 With these changes, your application has some validations in place to ensure consistency in the data that's saved to the database. Now you can turn your attention to your application's users and defining who can modify application data.
 
 ## Step 6 — Adding Authentication
-With validations in place, we have some guarantees about the data that's being saved to the database. But what about users? If we don't want any and all users adding to the database, then we should add some authentication measures to ensure that only permitted users can add sharks. In order to do this, we'll use the http_basic_authenticate_with method, which will allow us to create a username and password combination to authenticate users.
-   Fact Presence Warning
-   
- There are a number of ways to authenticate users with Rails, including working with the bcrypt or devise gems. For now, however, we will add a method to our application controller that will apply to actions across our application. This will be useful if we add more controllers to the application in the future.
-Stop your server again with CTRL+C .
-Open the file that defines your ApplicationController :
-Inside, you will see the definition for the ApplicationController class, which the other controllers in your application inherit from:
-      nano app/controllers/application_controller.rb
-  ~/sharkapp/app/controllers/application_controlle
-r.rb
-  class ApplicationController < ActionController::Base
+With validations in place, we have some guarantees about the data that's being saved to the database. But what about users? If we don't want any and all users adding to the database, then we should add some authentication measures to ensure that only permitted users can add books. In order to do this, we'll use the [http_basic_authenticate_with](https://api.rubyonrails.org/classes/ActionController/HttpAuthentication/Basic.html) method, which will allow us to create a username and password combination to authenticate users.
+ 
+There are a number of ways to authenticate users with Rails, including working with the [bcrypt](https://rubygems.org/gems/bcrypt/versions/3.1.12) or (our standard) [devise](https://rubygems.org/gems/devise) gems. For now, however, we will add a method to our application controller that will apply to actions across our application. This will be useful if we add more controllers to the application in the future.
+
+Stop your server again with `CTRL+C`.
+
+Open the file that defines your `ApplicationController`, `application_controller.rb`
+
+Inside, you will see the definition for the `ApplicationController` class, which the other controllers in your application inherit from:
+```
+class ApplicationController < ActionController::Base
 end
-To authenticate users, we'll use a hardcoded username and password with the http_basic_authenticate_with method. Add the following code to the file:
-  
-  In addition to supplying the username and password here, we've also restricted authentication by specifying the routes where it should not be required: index and show . Another way of accomplishing this would have been to write only: [:create, :update, :destroy]. This way, all users will be able to look at all of the sharks and read facts about particular sharks. When it comes to modifying site content, however, users will need to prove that they have access.
+```
+To authenticate users, we'll use a hardcoded username and password with the `http_basic_authenticate_with` method. Add the following code to the file:
+
+```
+class ApplicationController < ActionController::Base
+  http_basic_authenticate_with name: 'sammy', password: 'shar k', except: [:index, :show]
+end
+```
+In addition to supplying the username and password here, we've also restricted authentication by specifying the routes where it should *not* be required: `index` and `show` . Another way of accomplishing this would have been to write only: `[:create, :update, :destroy]`. This way, all users will be able to look at all of the books and read descriptions of the books. When it comes to modifying site content, however, users will need to prove that they have access.
+
 In a more robust setup, you would not want to hardcode values in this way, but for the purposes of demonstration, this will allow you to see how you can include authentication for your application's routes. It also lets you see how Rails stores session data by default in cookies: once you authenticate on a specified action, you will not be required to authenticate again in the same session.
-Save and close app/controllers/application_controller.rb when you are finished editing. You can now test authentication in action.
-Start the server with either rails s or rails s --binding=your_server_ip and navigate to your application at either http://localhost:3000 or htt
-       ~/sharkapp/app/controllers/application_controlle
-r.rb
-  class ApplicationController < ActionController::Base
-http_basic_authenticate_with name: 'sammy', password: 'shar k', except: [:index, :show]
-end
-  
- p://your_server_ip:3000
-     User Authentication
-   app/con
-   trollers/application_controller.rb
-   .
-On the landing page, click on the New Shark button. This will trigger the following authentication window:
-If you enter the username and password combination you added to
-, you will be able to securely create a
-new shark.
+
+Save `app/controllers/application_controller.rb` when you are finished editing. You can now test authentication in action.
+
+Start up your server once again
+```
+dip up
+```
+On the landing page, click on the *New Book* button. This will trigger the following authentication window:
+![Authentication Window](images/authentication-window.png)
+If you enter the username and password combination you added to `app/controllers/application_controller.rb`, you will be able to securely create a
+new book.
+
 You now have a working shark application, complete with data validations and a basic authentication scheme.
-Conclusion
-The Rails application you created in this tutorial is a jumping off point that you can use for further development. If you are interested in exploring the Rails ecosystem, the project documentation is a great place to start.
-You can also learn more about adding nested resources to your project by reading How To Create Nested Resources for a Ruby on Rails Application,
-  
- which will show you how to build out your application's models and routes.
-Additionally, you might want to explore how to set up a more robust frontend for your project with a framework such as React. How To Set Up a Ruby on Rails Project with a React Frontend offers guidance on how to do this.
-If you would like to explore different database options, you can also check out How To Use PostgreSQL with Your Ruby on Rails Application on Ubuntu 18.04, which walks through how to work with PostgreSQL instead of SQLite. You can also consult our library of PostgreSQL tutorials to learn more about working with this database.
-       
-How To Create Nested Resources for a Ruby on Rails Application
-Written by Kathleen Juell
+
+## How To Create Nested Resources for a Ruby on Rails Application
 Ruby on Rails is a web application framework written in Ruby that offers developers an opinionated approach to application development. Working with Rails gives developers: - Conventions for handling things like routing, stateful data, and asset management. - A firm grounding in the model-view- controller (MCV) architectural pattern, which separates an application's logic, located in models, from the presentation and routing of application information.
 As you add complexity to your Rails applications, you will likely work with multiple models, which represent your application's business logic and interface with your database. Adding related models means establishing meaningful relationships between them, which then affect how information gets relayed through your application's controllers, and how it is captured and presented back to users through views.
 In this tutorial, you will build on an existing Rails application that offers users facts about sharks. This application already has a model for handling shark data, but you will add a nested resource for posts about individual sharks. This will allow users to build out a wider body of thoughts and opinions about individual sharks.
