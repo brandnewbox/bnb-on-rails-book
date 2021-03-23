@@ -77,46 +77,53 @@ Now that you have tested your application's basic functionality, you can add som
 
 ## Step 5 — Adding Validations
 
-Your shark application can accept input from users, but imagine a case where a user attempts to create a shark without adding facts to it, or creates an entry for a shark that's already in the database. You can create mechanisms to check data before it gets entered into the database by adding validations to your models. Since your application's logic is located in its models, validating data input here makes more sense than doing so elsewhere in the application.
-Note that we will not cover writing validation tests in this tutorial, but you can find out more about testing by consulting the Rails documentation.
-If you haven't stopped the server yet, go ahead and do that by typing
-C.
-Open your shark.rb model file:
-Currently, the file tells us that the Shark class inherits from cord , which in turn inherits from ActiveRecord::Base:
-   CTRL+
-    nano app/models/shark.rb
-    ApplicationRe
-      
-  Let's first add some validations to our name field to confirm that the field is filled out and that the entry is unique, preventing duplicate entries:
-  ~/sharkapp/app/models/shark.rb
-  class Shark < ApplicationRecord
-  validates :name, presence: true, uniqueness: true
-end
-Next, add a validation for the facts field to ensure that it, too, is filled out:
-  ~/sharkapp/app/models/shark.rb
-  class Shark < ApplicationRecord
-validates :name, presence: true, uniqueness: true validates :facts, presence: true
-end
-We are less concerned here with the uniqueness of the facts, as long as they are associated with unique shark entries.
-Save and close the file when you are finished.
-~/sharkapp/app/models/shark.rb
- class Shark < ApplicationRecord
-end
-  
-    rails s
-http://localhost:3000
-rails s --binding=
-    your_server_ip
-     http://yo
-  ur_server_ip:3000
-     Unique Validation Warning
-   Start up your server once again with either or
-, depending on whether you are working locally or with a development server.
-Navigate to your application's root at or .
-Click on New Shark. In the form, add “Great White” to the Name field and “Big Teeth” to the Facts field, and then click on Create Shark. You should see the following warning:
-Now, let's see if we can check our other validation. Click Back to return to the homepage, and then New Shark once again. In the new form, enter “Tiger Shark” in the Name field, and leave Facts blank. Clicking Create Shark will trigger the following warning:
+Your book application can accept input from users, but imagine a case where a user attempts to create a book without adding a title to it, or creates an entry for a book that's already in the database. You can create mechanisms to check data before it gets entered into the database by adding validations to your models. Since your application's logic is located in its models, validating data input here makes more sense than doing so elsewhere in the application.
 
-  With these changes, your application has some validations in place to ensure consistency in the data that's saved to the database. Now you can turn your attention to your application's users and defining who can modify application data.
+Note that we will not cover writing validation tests in this tutorial, but you can find out more about testing by consulting [the Rails documentation](https://guides.rubyonrails.org/testing.html).
+
+If you haven't stopped the server yet, go ahead and do that by typing (in separate terminal)
+```
+dip down
+```
+or press `CTRL + C`
+
+Navigate to, and open your `book.rb` model file:
+
+Currently, the file tells us that the `Book` class inherits from `ApplicationRecord`, which in turn inherits from [ActiveRecord::Base](https://api.rubyonrails.org/classes/ActiveRecord/Base.html):
+```
+class Book < ApplicationRecord
+end
+```
+      
+Let's first add some validations to our title field to confirm that the field is filled out and that the entry is unique, preventing duplicate entries:
+```
+class Book < ApplicationRecord
+  validates :title, presence: true, uniqueness: true
+end
+```
+Next, add a validation for the `description` and `price` field to ensure that they, too, are filled out:
+```
+class Book < ApplicationRecord
+  validates :title, presence: true, uniqueness: true
+  validates :description, presence: true
+  validates :price, presence: true
+end
+```
+We are less concerned here with the uniqueness of the description, as long as they are associated with unique book entries.
+
+Save the file when you are finished.
+
+Start up your server once again
+```
+dip up
+```
+Navigate to your application's root at `http://localhost:3000`
+
+Click on *New Book*. In the form, add “A Walk in The Park” to the *Title* field, “Good day” to the *Description* field, and 10 to the *Price* field. Then click on *Create Book*. You should see the following warning:
+![Validation Error](images/title-validation.png)
+Now, let's see if we can check our other validation. Click *Back* to return to the homepage, and then *New Book* once again. In the new form, enter “High Noon” in the *Title* field, 10 to the *Price* field, and leave *Description* field blank. Clicking *Create Book* will trigger the following warning:
+![Validation Error](images/description-validation.png)
+With these changes, your application has some validations in place to ensure consistency in the data that's saved to the database. Now you can turn your attention to your application's users and defining who can modify application data.
 
 ## Step 6 — Adding Authentication
 With validations in place, we have some guarantees about the data that's being saved to the database. But what about users? If we don't want any and all users adding to the database, then we should add some authentication measures to ensure that only permitted users can add sharks. In order to do this, we'll use the http_basic_authenticate_with method, which will allow us to create a username and password combination to authenticate users.
