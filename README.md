@@ -29,6 +29,7 @@ This is the `hello-world` stuff. You can probably find this everywhere else on t
 
 At Brand New Box, we find ourselves using a lot of the same technology concepts over and over. Here they are.
 
+* [Nested Resources](./nested-resources.md)
 * [Switching from ERB to HAML](#)
 * [Layouts](./layouts.html)
 * [Adding Bootstrap](./bootstrap.html)
