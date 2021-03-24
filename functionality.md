@@ -45,7 +45,7 @@ Your application landing page will look like this:
 To create a new book, click on the *New Book* link at the bottom of the page, which will take you to the `book/new` route:
 ![New Book](images/new-book.png)
 
-Let's add some demo information to test our application. Input “A Walk in The Park” into the *Title* field, “A book of stories” into the *Description* field, 10 as a *Price*, and we will leave the subject blank for now:
+Let's add some demo information to test our application. Input “A Walk in The Park” into the *Title* field, “A book of stories” into the *Description* field, and 10 as a *Price*.
 
 Click on the Create button to create the book.
 
