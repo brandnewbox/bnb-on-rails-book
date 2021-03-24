@@ -2,7 +2,7 @@
 
 As you add complexity to your Rails applications, you will likely work with multiple models, which represent your application's business logic and interface with your database. Adding related models means establishing meaningful relationships between them, which then affect how information gets relayed through your application's controllers, and how it is captured and presented back to users through views.
 
-In this section, you will build on our existing `bnb-library` Rails application. This application already has a model for handling book data, but you will add a nested resource for publishers to categorize these books. This will allow users to build out a wider variety, and organize books under relevant publishers.
+In this section, you will build on our existing `bnb-library` Rails application. This application already has a model for handling book data, but you will be nesting it within a resource of publishers. This will add ownership to each book, as well as organize books under relevant publishers.
 
 ## Step 1 — Scaffolding the Nested Model
 
