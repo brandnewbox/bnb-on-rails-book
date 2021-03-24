@@ -2,85 +2,86 @@
 
 As you add complexity to your Rails applications, you will likely work with multiple models, which represent your application's business logic and interface with your database. Adding related models means establishing meaningful relationships between them, which then affect how information gets relayed through your application's controllers, and how it is captured and presented back to users through views.
 
-In this section, you will build on our existing `bnb-library` Rails application. This application already has a model for handling book data, but you will add a nested resource for subjects to categorize these books. This will allow users to build out a wider variety, and organize books under relevant subjects.
+In this section, you will build on our existing `bnb-library` Rails application. This application already has a model for handling book data, but you will add a nested resource for publishers to categorize these books. This will allow users to build out a wider variety, and organize books under relevant publishers.
 
 ## Step 1 — Scaffolding the Nested Model
 
-Our application will take advantage of Active Record [associations](https://guides.rubyonrails.org/association_basics.html) to build out a relationship between `Book` and `Subject` models: subjects will belong to particular books, and each book can have a single subject. Our `Book` and `Subject` models will therefore be related through [belongs_to](https://guides.rubyonrails.org/association_basics.html#the-belongs-to-association) and [has_many](https://guides.rubyonrails.org/association_basics.html#the-has-many-association) associations.
+Our application will take advantage of Active Record [associations](https://guides.rubyonrails.org/association_basics.html) to build out a relationship between `Book` and `Publisher` models: publishers will belong to particular books, and each book can have a single publisher. Our `Book` and `Publisher` models will therefore be related through [belongs_to](https://guides.rubyonrails.org/association_basics.html#the-belongs-to-association) and [has_many](https://guides.rubyonrails.org/association_basics.html#the-has-many-association) associations.
 
-The first step to building out the application in this way will be to create a
-model and related resources. To do this, we can use the
-command, which will give us a model, a database migration to alter the database schema, a controller, a full set of views to manage
-            
-  standard Create, Read, Update, and Delete (CRUD) operations, and templates for partials, helpers, and tests. We will need to modify these resources, but using the scaffold command will save us some time and energy since it generates a structure we can use as a starting point.
-First, make sure that you are in the sharkapp directory for the Rails project that you created in the prerequisites:
-Create your Post resources with the following command:
-With body:text, we're telling Rails to include a body field in the posts database table — the table that maps to the Post model. We're also including the :references keyword, which sets up an association between the Shark and Post models. Specifically, this will ensure that a foreign key representing each shark entry in the sharks database is added to the posts database.
-Once you have run the command, you will see output confirming the resources that Rails has generated for the application. Before moving on, you can check your database migration file to look at the relationship that now exists between your models and database tables. Use the following command to look at the contents of the file, making sure to substitute the timestamp on your own migration file for what's shown here:
-     cd sharkapp
-   rails generate scaffold Post body:text shark:references
+The first step to building out the application in this way will be to create a `Publisher` model and related resources. To do this, we can use the `rails generate scaffold` command, which will give us a model, a [database migration](https://guides.rubyonrails.org/active_record_migrations.html) to alter the database schema, a controller, a full set of views to manage standard [Create, Read, Update, and Delete](https://en.wikipedia.org/wiki/) (CRUD) operations, and templates for partials, helpers, and tests. We will need to modify these resources, but using the `scaffold` command will save us some time and energy since it generates a structure we can use as a starting point.
+
+First, make sure that you are in the `bnb-library` directory for the Rails project that you created in the prerequisites:
+
+Create your `publisher` resources with the following command:
+```
+dip rails generate scaffold Publisher name:string book:references
+```
+With name:string, we're telling Rails to include a `name` field in the `publishers` database table — the table that maps to the `Publisher` model. We're also including the `:references` keyword, which sets up an association between the `Book` and `Publisher` models. Specifically, this will ensure that a [foreign key](https://en.wikipedia.org/wiki/Foreign_key) representing each book entry in the `books` database is added to the `publishers` database.
+
+Once you have run the command, you will see output confirming the resources that Rails has generated for the application. Before moving on, you can check your database migration file to look at the relationship that now exists between your models and database tables.
           
-   You will see the following output:
- Output
-  class CreatePosts < ActiveRecord::Migration[5.2]
+You will see the following (the timestamp in the filename will be different):
+```
+# db/migrate/20210324201444_create_publishers.rb
+----------------------------------------------
+
+class CreatePublishers < ActiveRecord::Migration[6.1]
   def change
-create_table :posts do |t|
-t.text :body
-t.references :shark, foreign_key: true
+    create_table :publishers do |t|
+      t.string :name
+      t.references :book, null: false, foreign_key: true
+
       t.timestamps
     end
-end end
-As you can see, the table includes a column for a shark foreign key. This key will take the form of model_name_id — in our case, shark_id .
-Rails has established the relationship between the models elsewhere as well. Take a look at the newly generated Post model with the following command:
-     cat app/models/post.rb
-cat db/migrate/20190805132506_create_posts.rb
- 
-  The belongs_to association sets up a relationship between models in which a single instance of the declaring model belongs to a single instance of the named model. In the case of our application, this means that a single post belongs to a single shark.
-In addition to setting this relationship, the rails generate scaffold command also created routes and views for posts, as it did for our shark resources in Step 3 of How To Build a Ruby on Rails Application.
-This is a useful start, but we will need to configure some additional routing and solidify the Active Record association for the Shark model in order for the relationship between our models and routes to work as desired.
-Step 2 — Specifying Nested Routes and Associations for the Parent Model
-Rails has already set the belongs_to association in our Post model, thanks to the :references keyword in the rails generate scaffold command,
-but in order for that relationship to function properly we will need to specify a has_many association in our Shark model as well. We will also need to make changes to the default routing that Rails gave us in order to make post resources the children of shark resources.
-           Output
- class Post < ApplicationRecord
-  belongs_to :shark
+  end
 end
-  
-     app/models/sha
- has_many Shark nano
-    rk.rb
-   nano app/models/shark.rb
- ~/sharkapp/app/models/shark.rb
-  class Shark < ApplicationRecord
-  has_many :posts
-  validates :name, presence: true, uniqueness: true
-  validates :facts, presence: true
-end
- dependent
- destroy
-  To add the association to the model, open using or your favorite editor:
-Add the following line to the file to establish the relationship between sharks and posts:
-One thing that is worth thinking about here is what happens to posts once a particular shark is deleted. We likely do not want the posts associated with a deleted shark persisting in the database. To ensure that any posts associated with a given shark are eliminated when that shark is deleted, we can include the option with the association.
-Add the following code to the file to ensure that the action on a given shark deletes any associated posts:
+```
+As you can see, the table includes a column for a book foreign key. This key will take the form of model_name_id — in our case, book_id.
 
-   Once you have finished making these changes, save and close the file. If you are using nano , you can do this by pressing CTRL+X , Y , then ENTER .
-Next, open your config/routes.rb file to modify the relationship between your resourceful routes:
+Rails has established the relationship between the models elsewhere as well. Take a look at the newly generated `publisher` model:
+```
+# app/models/publisher.rb
+-----------------------
+
+class publisher < ApplicationRecord
+  has_many :book
+end
+```
+The `belongs_to` association sets up a relationship between models in which a single instance of the declaring model belongs to a single instance of the named model. In the case of our application, this means that a single publisher belongs to a publisher book.
+
+In addition to setting this relationship, the rails generate scaffold command also created routes and views for publishers, as it did for our book resources in [Step 3](./scaffolding.md) of Scaffolding.
+
+This is a useful start, but we will need to configure some additional routing and solidify the Active Record association for the `Book` model in order for the relationship between our models and routes to work as desired.
+
+## Step 2 — Specifying Nested Routes and Associations for the Parent Model
+
+Rails has already set the `belongs_to` association in our `publisher` model, thanks to the `:references` keyword in the `rails generate scaffold` command, but in order for that relationship to function properly we will need to specify a `has_one` association in our `Book` model as well. We will also need to make changes to the default routing that Rails gave us in order to make publishers resources the children of book resources.
+
+To add the `has_one` association to the `Book` model, open `app/models/book.rb` using VSCode, and add the following line to the file to establish the relationship between books and publishers:
+```
+# app/models/book.rb
+--------------------
+
+class Book < ApplicationRecord
+  has_one :publisher
+  validates :title, presence: true, uniqueness: true
+  validates :description, presence: true
+  validates :price, presence: true
+end
+```
+Once you have finished making these changes, save and close the file.
+
+Next, open your `config/routes.rb` file to modify the relationship between your resourceful routes:
+
 Currently, the file looks like this:
-      nano config/routes.rb
- ~/sharkapp/config/routes.rb
-  Rails.application.routes.draw do
-  resources :posts
-  resources :sharks
-  root 'sharks#index'
-  # For details on the DSL available within this file, see htt
-p://guides.rubyonrails.org/routing.html
+```
+Rails.application.routes.draw do
+  resources :publishers
+  resources :books
+  root "books#index"
+  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end
-~/sharkapp/app/models/shark.rb
- class Shark < ApplicationRecord
-has_many :posts , dependent: :destroy
-validates :name, presence: true, uniqueness: true validates :facts, presence: true
-end
- 
+```
  The current code establishes an independent relationship between our routes, when what we would like to express is a dependent relationship between sharks and their associated posts.
 Let's update our route declaration to make :sharks the parent of :posts. Update the code in the file to look like the following:
     ~/sharkapp/config/routes.rb

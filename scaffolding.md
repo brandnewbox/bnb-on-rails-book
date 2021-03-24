@@ -7,9 +7,9 @@ Our `generate scaffold` command will include the name of our model and the field
          
 Type the following command to generate a `Book` model, controller, and associated views:
 ```
-dip rails generate scaffold Book title:string description:text price:float subject_id:integer
+dip rails generate scaffold Book title:string description:text price:float
 ```
-With `name:string`, `price:float`, `subject_id:integer`, and `description:text` we are giving Rails information about the fields we would like in our database table and the type of data they should accept.
+With `name:string`, `price:float`, and `description:text` we are giving Rails information about the fields we would like in our database table and the type of data they should accept.
 
 When you type this command, you will again see a long list of output that explains everything Rails is generating for you. The output below highlights some of the more significant things for our setup:
 
@@ -55,7 +55,6 @@ create_table :books do |t|
   t.string :title, :string, limit: 32, null: false
   t.text :description
   t.float :price
-  t.integer :subject_id
 
   t.timestamps
 end
@@ -189,7 +188,6 @@ cat app/views/books/index.html.erb
       <th>Title</th>
       <th>Description</th>
       <th>Price</th>
-      <th>Subject</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -200,7 +198,6 @@ cat app/views/books/index.html.erb
         <td><%= book.title %></td>
         <td><%= book.description %></td>
         <td><%= book.price %></td>
-        <td><%= book.subject_id %></td>
         <td><%= link_to 'Show', book %></td>
         <td><%= link_to 'Edit', edit_book_path(book) %></td>
         <td><%= link_to 'Destroy', book, method: :delete, data: { confirm: 'Are you sure?' } %></td>
@@ -213,7 +210,7 @@ cat app/views/books/index.html.erb
 
 <%= link_to 'New Book', new_book_path %>
 ```
-The `index` view iterates through the instances of our `Book` class, which have been mapped to the books table in our database. Using [ERB templating](https://ruby-doc.org//stdlib-1.9.3/libdoc/erb/rdoc/ERB.html), the view outputs each field from the table that is associated with an individual book instance: `title`, `description`, `price`, and `subject`.
+The `index` view iterates through the instances of our `Book` class, which have been mapped to the books table in our database. Using [ERB templating](https://ruby-doc.org//stdlib-1.9.3/libdoc/erb/rdoc/ERB.html), the view outputs each field from the table that is associated with an individual book instance: `title`, `description`, and `price`.
 
 The view then uses the [link_to](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/UrlHelper.html#method-i-link_to) helper to create a hyperlink, with the provided string as the text for the link and the provided path as the
 destination. The paths themselves are made possible through the [helpers](https://guides.rubyonrails.org/routing.html#path-and-url-helpers) that became available to us when we defined the `books` resourceful route with the `rails generate scaffold` command.
@@ -263,17 +260,12 @@ cat app/views/books/_form.html.erb
     <%= form.text_field :price %>
   </div>
 
-  <div class="field">
-    <%= form.label :subject_id %>
-    <%= form.number_field :subject_id %>
-  </div>
-
   <div class="actions">
     <%= form.submit %>
   </div>
 <% end %>
 ```
-This template makes use of the [form_with](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/FormHelper.html#method-i-form_with) [form helper](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/FormHelper.html). Form helpers are designed to facilitate the creation of new objects from user input using the fields and scope of particular models. Here, `form_with` takes `model: book` as an argument, and the new form builder object that it creates has field inputs that correspond to the fields in the `books` table. Thus users have form fields to enter a book title, description, price, and subject.
+This template makes use of the [form_with](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/FormHelper.html#method-i-form_with) [form helper](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/FormHelper.html). Form helpers are designed to facilitate the creation of new objects from user input using the fields and scope of particular models. Here, `form_with` takes `model: book` as an argument, and the new form builder object that it creates has field inputs that correspond to the fields in the `books` table. Thus users have form fields to enter a book title, description, and price.
 
 Submitting this form will create a JSON response with user data that the rest of your application can access by way of the [params method](https://api.rubyonrails.org/classes/ActionController/Parameters.html), which creates a `ActionController::Parameters` object with that data.
 
