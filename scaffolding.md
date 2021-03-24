@@ -52,7 +52,7 @@ create    app/assets/stylesheets/scaffolds.scss
 Rails has created the model at `app/models/book.rb` and a database migration to go with it: `db/migrate/20210318152156_create_books.rb`. The timestamp on your migration file will differ from what you see here. You can see the fields we included in our initial call of `rails generate scaffold`. Let's update the title column with a few constraints.
 ```
 create_table :books do |t|
-  t.string :title, :string, limit: 32, null: false
+  t.string :title, limit: 32, null: false
   t.text :description
   t.float :price
 
@@ -71,12 +71,10 @@ Finally, Rails added a new resourceful route, `resources :books`, to
 
 Though Rails has done much of the work of building out our application code for us, it is worth taking a look at some files to understand what is happening.
 
-First, let's look at the controller file with the following command:
+First, let's look at the controller file within VSCode:
 ```
-cat app/controllers/books_controller.rb
-```
-```
-# Output
+# app/controllers/books_controller.rb
+-------------------------------------
 class BooksController < ApplicationController
   before_action :set_book, only: %i[ show edit update destroy ]
 
@@ -169,15 +167,13 @@ For example, consider the `create` method:
 ``` 
 If a new instance of the Book class is successfully saved, `redirect_to` will spawn a new request that is then directed to the controller. This will be a `GET` request, and it will be handled by the `show` method, which will show the user the `book` they've just added.
 
-If there is a failure, then Rails will render the `app/views/sharks/new.html.erb` template again rather than making another request to the router, giving users another chance to submit their data.
+If there is a failure, then Rails will render the `app/views/books/new.html.erb` template again rather than making another request to the router, giving users another chance to submit their data.
 
-In addition to the books controller, Rails has given us a template for an `index` view, which maps to the `index` method in our controller. We will use this as the root view for our application, so it's worth taking a look at it.
-
-Type the following to output the file:
-```
-cat app/views/books/index.html.erb
-```
+In addition to the books controller, Rails has given us a template for an `index` view, which maps to the `index` method in our controller. We will use this as the root view for our application, so it's worth taking a look at it within VSCode.
 ``` 
+# app/views/books/index.html.erb
+---------------------------------
+
 <p id="notice"><%= notice %></p>
 
 <h1>Books</h1>
@@ -214,11 +210,11 @@ The `index` view iterates through the instances of our `Book` class, which have 
 
 The view then uses the [link_to](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/UrlHelper.html#method-i-link_to) helper to create a hyperlink, with the provided string as the text for the link and the provided path as the
 destination. The paths themselves are made possible through the [helpers](https://guides.rubyonrails.org/routing.html#path-and-url-helpers) that became available to us when we defined the `books` resourceful route with the `rails generate scaffold` command.
-In addition to looking at our `index` view, we can also take a look at the new view to see how Rails uses partials in views. Type the following to output the `app/views/books/new.html.erb` template:
+In addition to looking at our `index` view, we can also take a look at the new view to see how Rails uses partials in views. Let's view the `app/views/books/new.html.erb` template within VSCode:
 ```
-cat app/views/books/new.html.erb
-```
-```
+# app/views/books/new.html.erb
+------------------------------
+
 <h1>New Book</h1>
 
 <%= render 'form', book: @book %>
@@ -227,11 +223,11 @@ cat app/views/books/new.html.erb
 ``` 
 Though this template may look like it lacks input fields for a new book entry, the reference to `render 'form'` tells us that the template is pulling in the `_form.html.erb` partial, which extracts code that is repeated across views.
 
-Looking at that file will give us a full sense of how a new book instance gets created:
+Looking at that file within VSCode will give us a full sense of how a new book instance gets created:
 ```
-cat app/views/books/_form.html.erb
-```
-```
+app/views/books/_form.html.erb
+------------------------------
+
 <%= form_with(model: book) do |form| %>
   <% if book.errors.any? %>
     <div id="error_explanation">
