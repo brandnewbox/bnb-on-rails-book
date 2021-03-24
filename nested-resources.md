@@ -44,7 +44,7 @@ Rails has established the relationship between the models elsewhere as well. Tak
 -----------------------
 
 class publisher < ApplicationRecord
-  has_many :book
+  has_many :books
 end
 ```
 The `belongs_to` association sets up a relationship between models in which a single instance of the declaring model belongs to a single instance of the named model. In the case of our application, this means that a single publisher belongs to a publisher book.
