@@ -52,7 +52,7 @@ create    app/assets/stylesheets/scaffolds.scss
 Rails has created the model at `app/models/book.rb` and a database migration to go with it: `db/migrate/20210318152156_create_books.rb`. The timestamp on your migration file will differ from what you see here. You can see the fields we included in our initial call of `rails generate scaffold`. Let's update the title column with a few constraints.
 ```
 create_table :books do |t|
-  t.string :title, :string, limit: 32, null: false
+  t.string :title, limit: 32, null: false
   t.text :description
   t.float :price
   t.integer :subject_id
