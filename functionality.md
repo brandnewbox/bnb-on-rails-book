@@ -4,12 +4,13 @@ Ideally, you want the landing page of your application to map to the application
 There are a number of ways you could handle this: for example, you could create a `Welcome` controller and an associated `index` view, which would give users a generic landing page that could also link out to different parts of the application. In our case, however, having users land on our books `index` view will be enough of an introduction to the application's purpose for now.
 
 To set this up, you will need to modify the routing settings in `config/routes.rb` to specify the root of the application.
-Open for editing, using `nano`.
-```
-nano config/routes.rb
-```
+Open the file for editing using VSCode.
+
 The file will look like this:
 ```
+# config/routes.rb
+------------------
+
 Rails.application.routes.draw do
   resources :books
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
@@ -19,6 +20,9 @@ end
 
 In order to map the root view of the application to the view of the books controller, you will need to add the following line to the file:
 ```
+# config/routes.rb
+------------------
+
 Rails.application.routes.draw do
   resources :books
 
@@ -47,6 +51,9 @@ Click on the Create button to create the book.
 
 This will direct you to the `show` route, which, thanks to the `before_action` filter, is set with the `set_book` method, which grabs the id of the book we've just created:
 ```
+# app/controllers/books_controller.rb
+-------------------------------------
+
 class BooksController < ApplicationController
   before_action :set_book, only: %i[ show edit update destroy ]
 
@@ -91,18 +98,27 @@ Navigate to, and open your `book.rb` model file:
 
 Currently, the file tells us that the `Book` class inherits from `ApplicationRecord`, which in turn inherits from [ActiveRecord::Base](https://api.rubyonrails.org/classes/ActiveRecord/Base.html):
 ```
+# app/models/book.rb
+--------------------
+
 class Book < ApplicationRecord
 end
 ```
       
 Let's first add some validations to our title field to confirm that the field is filled out and that the entry is unique, preventing duplicate entries:
 ```
+# app/models/book.rb
+--------------------
+
 class Book < ApplicationRecord
   validates :title, presence: true, uniqueness: true
 end
 ```
 Next, add a validation for the `description` and `price` field to ensure that they, too, are filled out:
 ```
+# app/models/book.rb
+--------------------
+
 class Book < ApplicationRecord
   validates :title, presence: true, uniqueness: true
   validates :description, presence: true
@@ -136,12 +152,18 @@ Open the file that defines your `ApplicationController`, `application_controller
 
 Inside, you will see the definition for the `ApplicationController` class, which the other controllers in your application inherit from:
 ```
+# app/controllers/application_controller.rb
+-------------------------------------------
+
 class ApplicationController < ActionController::Base
 end
 ```
 To authenticate users, we'll use a hardcoded username and password with the `http_basic_authenticate_with` method. Add the following code to the file:
 
 ```
+# app/controllers/application_controller.rb
+-------------------------------------------
+
 class ApplicationController < ActionController::Base
   http_basic_authenticate_with name: 'sammy', password: 'wammy', except: [:index, :show]
 end
