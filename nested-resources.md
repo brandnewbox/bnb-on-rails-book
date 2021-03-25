@@ -120,7 +120,7 @@ Save and close the file when you are finished editing.
 
 With these changes in place, you can move on to updating your reviews controller.
 
-## Step 3 — Updating the Posts Controller
+## Step 3 — Updating the Reviews Controller
 The association between our models gives us methods that we can use to create new review instances associated with particular books. To use these methods, we will need to add them our review controller.
  
 Open the review controller file, and currently, the file looks like this:
@@ -197,13 +197,12 @@ class ReviewsController < ApplicationController
       params.require(:review).permit(:body, :book_id)
     end
 end
-
 ```
  
 Like our books controller, this controller's methods work with instances of the associated `Review` class. For example, the `new` method creates a new instance of the `Review` class, the `index` method grabs all instances of the class, and the `set_review` method uses `find` and `params` to select a particular review by `id`. If, however, we want our review instances to be associated with particular book instances, then we will need to modify this code, since the
 `Review` class is currently operating as an independent entity.
 
-Our modifications will make use of two things: - The methods that became available to us when we added the `belongs_to` and `has_many` associations to our models. Specifically, we now have access to the [build method](https://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_many) thanks to the `has_many` association we defined in our `Book` model. This method will allow us to create a collection of review objects associated with a particular book object, using the `book_id` foreign key that exists in our `books` database. - The routes and routing helpers that became available when we created a nested `reviews` route. For a full list of example routes that become available when you create nested relationships between resources, see the [Rails documentation](https://guides.rubyonrails.org/routing.html#nested-resources). For now, it will be enough for us to know that for each specific book — say `books/1` — there will be an associated route for reviews related to that book: `books/1/posts`. There will also be routing helpers like `book_reviews_path(@book)` and `edit_books_reviews_path(@book)` that refer to these nested routes.
+Our modifications will make use of two things: - The methods that became available to us when we added the `belongs_to` and `has_many` associations to our models. Specifically, we now have access to the [build method](https://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_many) thanks to the `has_many` association we defined in our `Book` model. This method will allow us to create a collection of review objects associated with a particular book object, using the `book_id` foreign key that exists in our `books` database. - The routes and routing helpers that became available when we created a nested `reviews` route. For a full list of example routes that become available when you create nested relationships between resources, see the [Rails documentation](https://guides.rubyonrails.org/routing.html#nested-resources). For now, it will be enough for us to know that for each specific book — say `books/1` — there will be an associated route for reviews related to that book: `books/1/reviews`. There will also be routing helpers like `book_reviews_path(@book)` and `edit_book_reviews_path(@book)` that refer to these nested routes.
 
 In the file, we'll begin by writing a method, `get_book`, that will run before each action in the controller. This method will create a local `@book` instance variable by finding a book instance by `book_id`. With this variable available to us in the file, it will be possible to relate reviews to a specific book in the other methods.
 
@@ -212,14 +211,12 @@ Above the other `private` methods at the bottom of the file, add the following m
 # app/controllers/reviews_controller
 ------------------------------------
 
-.. . 
 private
   def get_book
     @book = Book.find(params[:book_id])
   end
   # Use callbacks to share common setup or constraints between
 actions.
-.. .
 ```
 Next, add the corresponding filter to the *top* of the file, before the existing filter:
 ```ruby
@@ -284,49 +281,179 @@ Next, take a look at the `update` method. This method uses a `@review` instance 
 
 Take a look at the filters at the top of the file. The second, auto-generated `before_action` filter provides an answer:
  
-The update method (like show , edit , and destroy ) takes a @post variable from the set_post method. That method, listed under the get_shark method with our other private methods, currently looks like this:
+The `update` method (like `show`, `edit`, and `destroy`) takes a `@review` variable from the `set_review` method. That method, listed under the `get_book` method with our other private methods, currently looks like this:
+```ruby
+# app/controllers/reviews_controller.rb
+---------------------------------------
 
-In keeping with the methods we've used elsewhere in the file, we will need to modify this method so that @post refers to a particular instance in the collection of posts that's associated with a particular shark. Keep the build method in mind here — thanks to the associations between our models, and the methods (like build) that are available to us by virtue of those associations, each of our post instances is part of a collection of objects that's associated with a particular shark. So it makes sense that when querying for a particular post, we would query the collection of posts associated with a particular shark.
-Update set_post to look like this:
+private
 
-Instead of finding a particular instance of the entire Post class by id, we instead search for a matching id in the collection of posts associated with a particular shark.
-With that method updated, we can look at the update and destroy methods.
-The update method makes use of the @post instance variable from
-st , and uses it with the post_params that the user has entered in the edit form. In the case of success, we want Rails to send the user back to the index view of the posts associated with a particular shark. In the case of errors, Rails will render the template again.
-In this case, the only change we will need to make is to the statement, to handle successful updates. Update it to redirect to
-shark's posts:
-, which will redirect to the view of the selected
+# Use callbacks to share common setup or constraints between actions.
+def set_review
+  @review = Review.find(params[:id])
+end
+```
+In keeping with the methods we've used elsewhere in the file, we will need to modify this method so that `@review` refers to a particular instance in the *collection* of reviews that's associated with a particular book. Keep the `build` method in mind here — thanks to the associations between our models, and the methods (like `build`) that are available to us by virtue of those associations, each of our review instances is part of a collection of objects that's associated with a particular book. So it makes sense that when querying for a particular review, we would query the collection of reviews associated with a particular book.
 
-Next, we will make a similar change to the destroy method. Update the re method to redirect requests to shark_posts_path(@shark) in the
+Update `set_review` to look like this:
+```ruby
+# app/controllers/reviews_controller.rb
+---------------------------------------
+
+private
+
+# Use callbacks to share common setup or constraints between actions.
+def set_review
+  @review = @book.reviews.find(params[:id])
+end
+```
+Instead of finding a particular instance of the entire `Review` class by `id`, we instead search for a matching `id` in the collection of reviews associated with a particular book.
+
+With that method updated, we can look at the `update` and `destroy` methods.
+
+The `update` method makes use of the `@review` instance variable from
+`set_review`, and uses it with the `review_params` that the user has entered in the `edit` form. In the case of success, we want Rails to send the user back to the `index` view of the reviews associated with a particular book. In the case of errors, Rails will render the `edit` template again.
+
+In this case, the only change we will need to make is to the `redirect_to` statement, to handle successful updates. Update it to redirect to `book_review_path(@book)`, which will redirect to the `index` view of the selected book's reviews:
+```ruby
+# app/controllers/reviews_controller.rb
+---------------------------------------
+
+# PATCH/PUT /reviews/1 or /reviews/1.json
+def update
+  respond_to do |format|
+    if @review.update(review_params)
+      format.html { redirect_to book_review_path(@book), notice: "Review was successfully updated." }
+      format.json { render :show, status: :ok, location: @review }
+    else
+      format.html { render :edit, status: :unprocessable_entity }
+      format.json { render json: @review.errors, status: :unprocessable_entity }
+    end
+  end
+end
+```
+Next, we will make a similar change to the `destroy` method. Update the `redirect_to` method to redirect requests to `book_review_path(@book)` in the
 case of success:
+```ruby
+# app/controllers/reviews_controller.rb
+---------------------------------------
 
- 
-The controller manages how information is passed from the view templates to the database and vice versa. Our controller now reflects the relationship between our Shark and Post models, in which posts are associated with particular sharks. We can move on to modifying the view templates themselves, which are where users will pass in and modify post information about particular sharks.
-Step 4 — Modifying Views
-Our view template revisions will involve changing the templates that relate to posts, and also modifying our sharks show view, since we want users to see the posts associated with particular sharks.
-Let's start with the foundational template for our posts: the form partial that is reused across multiple post templates. Open that form now:
+# DELETE /reviews/1 or /reviews/1.json
+def destroy
+  @review.destroy
+  respond_to do |format|
+    format.html { redirect_to book_review_path(@book), notice: "Review was successfully destroyed." }
+    format.json { head :no_content }
+  end
+end
+```
+This is the last change you will make. You now have a reviews controller that looks like this: 
+```ruby
+# app/controllers/reviews_controller.rb
+---------------------------------------
+
+class ReviewsController < ApplicationController
+  before_action :get_book
+  before_action :set_review, only: %i[ show edit update destroy ]
+
+  # GET /reviews or /reviews.json
+  def index
+    @reviews = @book.reviews 
+  end
+
+  # GET /reviews/1 or /reviews/1.json
+  def show
+  end
+
+  # GET /reviews/new
+  def new
+    @review = @book.reviews.build
+  end
+
+  # GET /reviews/1/edit
+  def edit
+  end
+
+  # POST /reviews or /reviews.json
+  def create
+    @review = @book.reviews.build(review_params)
+
+    respond_to do |format|
+      if @review.save
+        format.html { redirect_to book_reviews_path(@book), notice: "Review was successfully created." }
+        format.json { render :show, status: :created, location: @review }
+      else
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: @review.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # PATCH/PUT /reviews/1 or /reviews/1.json
+  def update
+    respond_to do |format|
+      if @review.update(review_params)
+        format.html { redirect_to book_review_path(@book), notice: "Review was successfully updated." }
+        format.json { render :show, status: :ok, location: @review }
+      else
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: @review.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /reviews/1 or /reviews/1.json
+  def destroy
+    @review.destroy
+    respond_to do |format|
+      format.html { redirect_to book_review_path(@book), notice: "Review was successfully destroyed." }
+      format.json { head :no_content }
+    end
+  end
+
+  private
+    def get_book
+      @book = Book.find(params[:book_id])
+    end
+
+    # Use callbacks to share common setup or constraints between actions.
+    def set_review
+      @review = @book.reviews.find(params[:id])
+    end
+
+    # Only allow a list of trusted parameters through.
+    def review_params
+      params.require(:review).permit(:body, :book_id)
+    end
+end
+```
+The controller manages how information is passed from the view templates to the database and vice versa. Our controller now reflects the relationship between our `Book` and `Review` models, in which reviews are associated with particular books. We can move on to modifying the view templates themselves, which are where users will pass in and modify Review information about particular books.
+
+## Step 4 — Modifying Views
+Our view template revisions will involve changing the templates that relate to reviews, and also modifying our books show view, since we want users to see the reviews associated with particular books.
+Let's start with the foundational template for our reviews: the form partial that is reused across multiple Review templates. Open that form now:
   
-Rather than passing only the post model to the form_with form helper, we will pass both the shark and post models, with post set as a child resource.
-Change the first line of the file to look like this, reflecting the relationship between our shark and post resources:
-      ~/sharkapp/views/posts/_form.html.erb
-  <%= form_with(model: [@shark, post], local: true) do |form| %> .. .
-Next, delete the section that lists the shark_id of the related shark, since this is not essential information in the view.
-The finished form, complete with our edits to the first line and without the deleted shark_id section, will look like this:
-  nano app/views/posts/_form.html.erb
+Rather than passing only the Review model to the form_with form helper, we will pass both the book and Review models, with Review set as a child resource.
+Change the first line of the file to look like this, reflecting the relationship between our book and Review resources:
+      ~/bookapp/views/reviews/_form.html.erb
+  <%= form_with(model: [@book, Review], local: true) do |form| %> .. .
+Next, delete the section that lists the book_id of the related book, since this is not essential information in the view.
+The finished form, complete with our edits to the first line and without the deleted book_id section, will look like this:
+  nano app/views/reviews/_form.html.erb
  
   Save and close the file when you are finished editing.
  
-  Next, open the index view, which will show the posts associated with a particular shark:
-Thanks to the rails generate scaffold command, Rails has generated the better part of the template, complete with a table that shows the body field of each post and its associated shark .
-Much like the other code we have already modified, however, this template treats posts as independent entities, when we would like to make use of the associations between our models and the collections and helper methods that these associations give us.
+  Next, open the index view, which will show the reviews associated with a particular book:
+Thanks to the rails generate scaffold command, Rails has generated the better part of the template, complete with a table that shows the body field of each Review and its associated book .
+Much like the other code we have already modified, however, this template treats reviews as independent entities, when we would like to make use of the associations between our models and the collections and helper methods that these associations give us.
 In the body of the table, make the following updates:
-First, update post.shark to post.shark.name , so that the table will include the name field of the associated shark, rather than identifying information about the shark object itself:
-   nano app/views/posts/index.html.erb
+First, update Review.book to Review.book.name , so that the table will include the name field of the associated book, rather than identifying information about the book object itself:
+   nano app/views/reviews/index.html.erb
      
-  Next, change the Show redirect to direct users to the show view for the associated shark, since they will most likely want a way to navigate back to the original shark. We can make use of the @shark instance variable that we set in the controller here, since Rails makes instance variables created in the controller available to all views. We'll also change the text for the link from
-Show to Show Shark , so that users will better understand its function. Update the this line to the following:
+  Next, change the Show redirect to direct users to the show view for the associated book, since they will most likely want a way to navigate back to the original book. We can make use of the @book instance variable that we set in the controller here, since Rails makes instance variables created in the controller available to all views. We'll also change the text for the link from
+Show to Show book , so that users will better understand its function. Update the this line to the following:
 
-In the next line, we want to ensure that users are routed the right nested path when they go to edit a post. This means that rather than being directed to po
+In the next line, we want to ensure that users are routed the right nested path when they go to edit a Review. This means that rather than being directed to po
 , users will be directed to
 . To do this, we'll use the routing helper and our
 models, which Rails will treat as URLs. We'll also update the link text to make its function clearer.
@@ -334,12 +461,12 @@ Update the line to look like the following:
  Next, let's add a similar change to the link, updating its function in the string, and adding our and resources:
 
 
-   Finally, at the bottom of the form, we will want to update the path to take users to the appropriate nested path when they want to create a new post. Update the last line of the file to make use of the
+   Finally, at the bottom of the form, we will want to update the path to take users to the appropriate nested path when they want to create a new Review. Update the last line of the file to make use of the
 routing helper:
 The finished file will look like this:
 
  Save and close the file when you are finished editing.
-The other edits we will make to post views won't be as numerous, since our other views use the partial we have already edited. However, we will want to update the references in the other post templates to reflect the changes we have made to our partial.
+The other edits we will make to Review views won't be as numerous, since our other views use the partial we have already edited. However, we will want to update the references in the other Review templates to reflect the changes we have made to our partial.
 Open :
 Update the reference at the bottom of the file to make use of the s helper:
  Save and close the file when you are finished making this change.
@@ -353,13 +480,13 @@ Make the following edits to the Edit and Back paths at the bottom of the file:
 
 Save and close the file when you are finished.
 
-  As a final step, we will want to update the show view for our sharks so that posts are visible for individual sharks. Open that file now:
-Our edits here will include adding a Posts section to the form and an Add Post link at the bottom of the file.
-Below the Facts for a given shark, we will add a new section that iterates through each instance in the collection of posts associated with this shark, outputting the body of each post.
+  As a final step, we will want to update the show view for our books so that reviews are visible for individual books. Open that file now:
+Our edits here will include adding a reviews section to the form and an Add Review link at the bottom of the file.
+Below the Facts for a given book, we will add a new section that iterates through each instance in the collection of reviews associated with this book, outputting the body of each Review.
 Add the following code below the Facts section of the form, and above the redirects at the bottom of the file:
-   nano app/views/sharks/show.html.erb
+   nano app/views/books/show.html.erb
       
-  Next, add a new redirect to allow users to add a new post for this particular shark:
+  Next, add a new redirect to allow users to add a new Review for this particular book:
  
  Save and close the file when you are finished editing.
-You have now made changes to your application's models, controllers, and views to ensure that posts are always associated with a particular shark. As a final step, we can add some validations to our Post model to guarantee consistency in the data that's saved to the database.
+You have now made changes to your application's models, controllers, and views to ensure that reviews are always associated with a particular book. As a final step, we can add some validations to our Review model to guarantee consistency in the data that's saved to the database.
