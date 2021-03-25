@@ -430,63 +430,227 @@ end
 The controller manages how information is passed from the view templates to the database and vice versa. Our controller now reflects the relationship between our `Book` and `Review` models, in which reviews are associated with particular books. We can move on to modifying the view templates themselves, which are where users will pass in and modify Review information about particular books.
 
 ## Step 4 — Modifying Views
-Our view template revisions will involve changing the templates that relate to reviews, and also modifying our books show view, since we want users to see the reviews associated with particular books.
-Let's start with the foundational template for our reviews: the form partial that is reused across multiple Review templates. Open that form now:
+Our view template revisions will involve changing the templates that relate to reviews, and also modifying our books `show` view, since we want users to see the reviews associated with particular books.
+
+Let's start with the foundational template for our reviews: the `form` partial that is reused across multiple review templates. Open that form now.
   
-Rather than passing only the Review model to the form_with form helper, we will pass both the book and Review models, with Review set as a child resource.
-Change the first line of the file to look like this, reflecting the relationship between our book and Review resources:
-      ~/bookapp/views/reviews/_form.html.erb
-  <%= form_with(model: [@book, Review], local: true) do |form| %> .. .
-Next, delete the section that lists the book_id of the related book, since this is not essential information in the view.
-The finished form, complete with our edits to the first line and without the deleted book_id section, will look like this:
-  nano app/views/reviews/_form.html.erb
+Rather than passing only the `review` model to the `form_with` form helper, we will pass both the `book` and `review` models, with `review` set as a child resource.
+
+Change the first line of the file to look like this, reflecting the relationship between our book and review resources:
+```erb
+# app/views/reviews/_form.html.erb
+----------------------------------
+
+<%= form_with(model: [@book, review]) do |form| %>
+```
+Next, *delete* the section that lists the `book_id` of the related book, since this is not essential information in the view.
+
+The finished form, complete with our edits to the first line and without the deleted `book_id` section, will look like this:
+```erb
+# app/views/reviews/_form.html.erb
+----------------------------------
+
+<%= form_with(model: review) do |form| %>
+  <% if review.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(review.errors.count, "error") %> prohibited this review from being saved:</h2>
+
+      <ul>
+        <% review.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :body %>
+    <%= form.text_area :body %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
+```
+Save and close the file when you are finished editing.
  
-  Save and close the file when you are finished editing.
- 
-  Next, open the index view, which will show the reviews associated with a particular book:
-Thanks to the rails generate scaffold command, Rails has generated the better part of the template, complete with a table that shows the body field of each Review and its associated book .
+Next, open the `index` view, which will show the reviews associated with a particular book.
+
+Thanks to the `rails generate scaffold` command, Rails has generated the better part of the template, complete with a table that shows the `body` field of each review and its associated `book`.
+
 Much like the other code we have already modified, however, this template treats reviews as independent entities, when we would like to make use of the associations between our models and the collections and helper methods that these associations give us.
+
 In the body of the table, make the following updates:
-First, update Review.book to Review.book.name , so that the table will include the name field of the associated book, rather than identifying information about the book object itself:
-   nano app/views/reviews/index.html.erb
-     
-  Next, change the Show redirect to direct users to the show view for the associated book, since they will most likely want a way to navigate back to the original book. We can make use of the @book instance variable that we set in the controller here, since Rails makes instance variables created in the controller available to all views. We'll also change the text for the link from
-Show to Show book , so that users will better understand its function. Update the this line to the following:
 
-In the next line, we want to ensure that users are routed the right nested path when they go to edit a Review. This means that rather than being directed to po
-, users will be directed to
-. To do this, we'll use the routing helper and our
-models, which Rails will treat as URLs. We'll also update the link text to make its function clearer.
-Update the line to look like the following:
- Next, let's add a similar change to the link, updating its function in the string, and adding our and resources:
+First, update `review.book` to `review.book.title`, so that the table will include the title field of the associated book, rather than identifying information about the book object itself:
 
+```erb
+# app/views/reviews/index.html.erb
+----------------------------------
 
-   Finally, at the bottom of the form, we will want to update the path to take users to the appropriate nested path when they want to create a new Review. Update the last line of the file to make use of the
-routing helper:
+<tbody>
+  <% @reviews.each do |review| %>
+    <tr>
+      <td><%= review.body %></td>
+      <td><%= review.book.title %></td>
+```
+Next, change the `Show` redirect to direct users to the `show` view for the associated book, since they will most likely want a way to navigate back to the original book. We can make use of the `@book` instance variable that we set in the controller here, since Rails makes instance variables created in the controller available to all views. We'll also change the text for the link from `Show` to `Show book`, so that users will better understand its function.
+
+Update the this line to the following:
+
+```erb
+# app/views/reviews/index.html.erb
+----------------------------------
+<tbody>
+  <% @reviews.each do |review| %>
+    <tr>
+      <td><%= review.body %></td>
+      <td><%= review.book_id %></td>
+      <td><%= link_to 'Show Book', [@book] %></td>
+```
+In the next line, we want to ensure that users are routed the right nested path when they go to edit a review. This means that rather than being directed to `reviews/review_id/edit`, users will be directed to `book/book_id/reviews/review_id/edit`. To do this, we'll use the `book_review_path` routing helper and our models, which Rails will treat as URLs. We'll also update the link text to make its function clearer.
+
+Update the `Edit` line to look like the following:
+```erb
+# app/views/reviews/index.html.erb
+----------------------------------
+
+<tbody>
+  <% @reviews.each do |review| %>
+    <tr>
+      <td><%= review.body %></td>
+      <td><%= review.book_id %></td>
+      <td><%= link_to 'Show Book', [@book] %></td>
+      <td><%= link_to 'Edit Review', edit_book_review_path(@book, review) %></td>
+```
+Next, let's add a similar change to the `Destroy` link, updating its function in the string, and adding our `book` and `review` resources:
+```erb
+# app/views/reviews/index.html.erb
+----------------------------------
+
+<tbody>
+  <% @reviews.each do |review| %>
+    <tr>
+      <td><%= review.body %></td>
+      <td><%= review.book_id %></td>
+      <td><%= link_to 'Show Book', [@book] %></td>
+      <td><%= link_to 'Edit Review', edit_book_review_path(@book, review) %></td>
+      <td><%= link_to 'Destroy Review', [@book, review], method: :delete, data: { confirm: 'Are you sure?' } %></td>
+```
+Finally, at the bottom of the form, we will want to update the path to take users to the appropriate nested path when they want to create a new review. Update the last line of the file to make use of the `new_book_review_path(@book)` routing helper:
+```erb
+# app/views/reviews/index.html.erb
+----------------------------------
+
+<%= link_to 'New Review', new_book_review_path(@book) %>
+```
 The finished file will look like this:
+```erb
+# app/views/reviews/index.html.erb
+----------------------------------
 
- Save and close the file when you are finished editing.
-The other edits we will make to Review views won't be as numerous, since our other views use the partial we have already edited. However, we will want to update the references in the other Review templates to reflect the changes we have made to our partial.
-Open :
-Update the reference at the bottom of the file to make use of the s helper:
- Save and close the file when you are finished making this change.
+<p id="notice"><%= notice %></p>
 
- Next, open the edit template:
-In addition to the Back path, we'll update Show to reflect our nested resources. Change the last two lines of the file to look like this:
- 
+<h1>Reviews</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Body</th>
+      <th>Book</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @reviews.each do |review| %>
+      <tr>
+        <td><%= review.body %></td>
+        <td><%= review.book_id %></td>
+        <td><%= link_to 'Show Book', [@book] %></td>
+        <td><%= link_to 'Edit Review', edit_book_review_path(@book, review) %></td>
+        <td><%= link_to 'Destroy Review', [@book, review], method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Review', new_book_review_path(@book) %>
+```
+Save and close the file when you are finished editing.
+
+The other edits we will make to review views won't be as numerous, since our other views use the `form` partial we have already edited. However, we will want to update the `link_to` references in the other review templates to reflect the changes we have made to our partial.
+
+Open `app/views/reviews/new.html.erb`:
+
+Update the `link_to` reference at the bottom of the file to make use of the `book_reviews_path(@book)` helper:
+```erb
+# app/views/reviews/new.html.erb
+----------------------------------
+
+<%= link_to 'Back', book_reviews_path(@book) %>
+```
+Save and close the file when you are finished making this change.
+
+Next, open the `edit` template:
+
+In addition to the `Back` path, we'll update `Show` to reflect our nested resources. Change the last two lines of the file to look like this:
+```erb
+# app/views/reviews/edit.html.erb
+----------------------------------
+
+<%= link_to 'Show', [@book, @review] %> |
+<%= link_to 'Back', book_reviews_path(@book) %>
+```
 Save and close the file.
-Next, open the show template:
-Make the following edits to the Edit and Back paths at the bottom of the file:
 
+Next, open the `show` template:
+
+Make the following edits to the `Edit` and `Back` paths at the bottom of the file:
+```erb
+# app/views/reviews/show.html.erb
+----------------------------------
+
+<%= link_to 'Edit', edit_book_review_path(@book, @review) %> |
+<%= link_to 'Back', book_reviews_path(@book) %>
+```
 Save and close the file when you are finished.
 
-  As a final step, we will want to update the show view for our books so that reviews are visible for individual books. Open that file now:
-Our edits here will include adding a reviews section to the form and an Add Review link at the bottom of the file.
-Below the Facts for a given book, we will add a new section that iterates through each instance in the collection of reviews associated with this book, outputting the body of each Review.
-Add the following code below the Facts section of the form, and above the redirects at the bottom of the file:
-   nano app/views/books/show.html.erb
-      
-  Next, add a new redirect to allow users to add a new Review for this particular book:
- 
- Save and close the file when you are finished editing.
-You have now made changes to your application's models, controllers, and views to ensure that reviews are always associated with a particular book. As a final step, we can add some validations to our Review model to guarantee consistency in the data that's saved to the database.
+As a final step, we will want to update the `show` view for our books so that reviews are visible for individual books. Open that file now:
+
+Our edits here will include adding a `Reviews` section to the form and an `Add Review` link at the bottom of the file.
+
+Below the `Price` for a given book, we will add a new section that iterates through each instance in the collection of reviews associated with this book, outputting the `body` of each review.
+
+Add the following code below the `Price` section of the form, and above the redirects at the bottom of the file:
+```erb
+# app/views/books/show.html.erb
+----------------------------------
+
+<p>
+  <strong>Price:</strong>
+  <%= @book.price %>
+</p>
+
+<h2>Reviews</h2>
+<% for review in @book.reviews %>
+  <ul>
+    <li><%= review.body %>%</li>
+  </ul>
+<% end %>
+```
+Next, add a new redirect to allow users to add a new review for this particular book:
+```erb
+# app/views/books/show.html.erb
+----------------------------------
+
+<%= link_to 'Edit', edit_book_path(@book) %> |
+<%= link_to 'Add Review', book_reviews_path(@book) %> |
+<%= link_to 'Back', books_path %>
+```  
+Save and close the file when you are finished editing.
+
+You have now made changes to your application's models, controllers, and views to ensure that reviews are always associated with a particular book. As a final step, we can add some validations to our `Review` model to guarantee consistency in the data that's saved to the database.
