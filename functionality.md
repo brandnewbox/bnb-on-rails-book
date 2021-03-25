@@ -7,7 +7,7 @@ To set this up, you will need to modify the routing settings in `config/routes.r
 Open the file for editing using VSCode.
 
 The file will look like this:
-```
+```ruby
 # config/routes.rb
 ------------------
 
@@ -19,7 +19,7 @@ end
  Without setting something more specific, the default view at `http://localhost:3000` will be the default Rails welcome page.
 
 In order to map the root view of the application to the view of the books controller, you will need to add the following line to the file:
-```
+```ruby
 # config/routes.rb
 ------------------
 
@@ -50,7 +50,7 @@ Let's add some demo information to test our application. Input “A Walk in The 
 Click on the Create button to create the book.
 
 This will direct you to the `show` route, which, thanks to the `before_action` filter, is set with the `set_book` method, which grabs the id of the book we've just created:
-```
+```ruby
 # app/controllers/books_controller.rb
 -------------------------------------
 
@@ -97,7 +97,7 @@ or press `CTRL + C`
 Navigate to, and open your `book.rb` model file:
 
 Currently, the file tells us that the `Book` class inherits from `ApplicationRecord`, which in turn inherits from [ActiveRecord::Base](https://api.rubyonrails.org/classes/ActiveRecord/Base.html):
-```
+```ruby
 # app/models/book.rb
 --------------------
 
@@ -106,7 +106,7 @@ end
 ```
       
 Let's first add some validations to our title field to confirm that the field is filled out and that the entry is unique, preventing duplicate entries:
-```
+```ruby
 # app/models/book.rb
 --------------------
 
@@ -115,7 +115,7 @@ class Book < ApplicationRecord
 end
 ```
 Next, add a validation for the `description` and `price` field to ensure that they, too, are filled out:
-```
+```ruby
 # app/models/book.rb
 --------------------
 
@@ -151,7 +151,7 @@ Stop your server again with `CTRL+C`.
 Open the file that defines your `ApplicationController`, `application_controller.rb`
 
 Inside, you will see the definition for the `ApplicationController` class, which the other controllers in your application inherit from:
-```
+```ruby
 # app/controllers/application_controller.rb
 -------------------------------------------
 
@@ -160,7 +160,7 @@ end
 ```
 To authenticate users, we'll use a hardcoded username and password with the `http_basic_authenticate_with` method. Add the following code to the file:
 
-```
+```ruby
 # app/controllers/application_controller.rb
 -------------------------------------------
 
@@ -180,7 +180,6 @@ dip up
 ```
 On the landing page, click on the *New Book* button. This will trigger the following authentication window:
 ![Authentication Window](images/authentication-window.png)
-If you enter the username and password combination you added to `app/controllers/application_controller.rb`, you will be able to securely create a
-new book.
+If you enter the username and password combination you added to `app/controllers/application_controller.rb`, you will be able to securely create a new book.
 
-You now have a working shark application, complete with data validations and a basic authentication scheme.
+You now have a working book application, complete with data validations and a basic authentication scheme!

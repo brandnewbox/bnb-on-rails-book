@@ -6,14 +6,14 @@ Because the `generate scaffold` command does so much work for us, we'll take a c
 Our `generate scaffold` command will include the name of our model and the fields we want in our database table. Rails uses [Active Record](https://github.com/rails/rails/tree/master/activerecord) to manage relationships between application data, constructed as objects with models, and the application database. Each of our models is a [Ruby class](https://ruby-doc.org/core-2.5.3/Class.html), while also inheriting from the `ActiveRecord::Base` class. This means that we can work with our model class in the same way that we would work with a Ruby class, while also pulling in methods from Active Record. Active Record will then ensure that each class is mapped to a table in our database, and each instance of that class to a row in that table.
          
 Type the following command to generate a `Book` model, controller, and associated views:
-```
+```ruby
 dip rails generate scaffold Book title:string description:text price:float
 ```
 With `name:string`, `price:float`, and `description:text` we are giving Rails information about the fields we would like in our database table and the type of data they should accept.
 
 When you type this command, you will again see a long list of output that explains everything Rails is generating for you. The output below highlights some of the more significant things for our setup:
 
-```
+```ruby
 # Output
 invoke  active_record
 create    db/migrate/20210318152156_create_books.rb
@@ -50,7 +50,7 @@ invoke  scss
 create    app/assets/stylesheets/scaffolds.scss
 ```
 Rails has created the model at `app/models/book.rb` and a database migration to go with it: `db/migrate/20210318152156_create_books.rb`. The timestamp on your migration file will differ from what you see here. You can see the fields we included in our initial call of `rails generate scaffold`. Let's update the title column with a few constraints.
-```
+```ruby
 # db/migrate/20210318152156_create_books.rb
 -------------------------------------------
 
@@ -75,7 +75,7 @@ Finally, Rails added a new resourceful route, `resources :books`, to
 Though Rails has done much of the work of building out our application code for us, it is worth taking a look at some files to understand what is happening.
 
 First, let's look at the controller file within VSCode:
-```
+```ruby
 # app/controllers/books_controller.rb
 -------------------------------------
 
@@ -152,7 +152,7 @@ end
 The controller is responsible for managing how information gets fetched and passed to its associated model, and how it gets associated with particular views. As you can see, our `books` controller includes a series of methods that map roughly to standard CRUD operations. However, there are more methods than CRUD functions, to enable efficiency in the case of errors.
 
 For example, consider the `create` method:
-```
+```ruby
  .. .
   def create
     @book = Book.new(book_params)
@@ -174,7 +174,7 @@ If a new instance of the Book class is successfully saved, `redirect_to` will sp
 If there is a failure, then Rails will render the `app/views/books/new.html.erb` template again rather than making another request to the router, giving users another chance to submit their data.
 
 In addition to the books controller, Rails has given us a template for an `index` view, which maps to the `index` method in our controller. We will use this as the root view for our application, so it's worth taking a look at it within VSCode.
-``` 
+```erb
 # app/views/books/index.html.erb
 ---------------------------------
 
@@ -215,7 +215,7 @@ The `index` view iterates through the instances of our `Book` class, which have 
 The view then uses the [link_to](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/UrlHelper.html#method-i-link_to) helper to create a hyperlink, with the provided string as the text for the link and the provided path as the
 destination. The paths themselves are made possible through the [helpers](https://guides.rubyonrails.org/routing.html#path-and-url-helpers) that became available to us when we defined the `books` resourceful route with the `rails generate scaffold` command.
 In addition to looking at our `index` view, we can also take a look at the new view to see how Rails uses partials in views. Let's view the `app/views/books/new.html.erb` template within VSCode:
-```
+```erb
 # app/views/books/new.html.erb
 ------------------------------
 
@@ -228,7 +228,7 @@ In addition to looking at our `index` view, we can also take a look at the new v
 Though this template may look like it lacks input fields for a new book entry, the reference to `render 'form'` tells us that the template is pulling in the `_form.html.erb` partial, which extracts code that is repeated across views.
 
 Looking at that file within VSCode will give us a full sense of how a new book instance gets created:
-```
+```erb
 app/views/books/_form.html.erb
 ------------------------------
 
