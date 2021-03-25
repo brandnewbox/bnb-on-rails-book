@@ -342,7 +342,7 @@ case of success:
 def destroy
   @review.destroy
   respond_to do |format|
-    format.html { redirect_to book_review_path(@book), notice: "Review was successfully destroyed." }
+    format.html { redirect_to book_reviews_path(@book), notice: "Review was successfully destroyed." }
     format.json { head :no_content }
   end
 end
@@ -393,7 +393,7 @@ class ReviewsController < ApplicationController
   def update
     respond_to do |format|
       if @review.update(review_params)
-        format.html { redirect_to book_review_path(@book), notice: "Review was successfully updated." }
+        format.html { redirect_to book_reviews_path(@book), notice: "Review was successfully updated." }
         format.json { render :show, status: :ok, location: @review }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -654,3 +654,217 @@ Next, add a new redirect to allow users to add a new review for this particular 
 Save and close the file when you are finished editing.
 
 You have now made changes to your application's models, controllers, and views to ensure that reviews are always associated with a particular book. As a final step, we can add some validations to our `Review` model to guarantee consistency in the data that's saved to the database.
+
+## Step 5 — Adding Validations and Testing the Application
+In [Step 5](./functionality.md) of Basic Functionality, you added validations to your `Book` model to ensure uniformity and consistency in the data that gets saved to the `books` database. We'll now take a similar step to ensure guarantees for the `reviews` database as well.
+
+Open the file where your `Review` model is defined:
+
+Here, we want to ensure that reviews are not blank and that they don't duplicate content other users may have posted. To achieve this, add the following line to the file:
+```ruby
+# app/models/review.rb
+----------------------
+
+class Review < ApplicationRecord
+  belongs_to :book
+  validates :body, presence: true, uniqueness: true
+end
+```
+Save and close the file when you are finished editing.
+
+With this last change in place, you are ready to run your migrations and test the application.
+
+First, run your migrations:
+```
+dip rails db:migrate
+```
+Next, start your server.
+```
+dip up
+```
+Navigate to your application's root at `http://localhost:3000`.
+
+The prerequisite Rails project tutorial walked you through adding and editing *A Walk in the Park* book entry. If you have not added any further book, the application landing page will look like this:
+![Index Book](images/index-book2.png)
+Click on *Show* next to the *A Walk in the Park* name. This will take you to the `show` view for this book. You will see the title of the book, it's description, and price, and a *Reviews* header with no content. Let's add a review to populate this part of the form.
+
+Click on *Add Review* below the *Review* header. This will bring you to the review `index` view, where you will have the chance to select *New Review*:
+![New Review](images/new-review.png)   
+Thanks to the authentication mechanisms you put in place in [Step 6](./functionality.md) of Basic Functionality, you may be asked to authenticate with the username and password you created in that Step, depending on whether or not you have created a new session.
+
+Click on *New Review*, which will bring you to your review `new` template:
+![New Review](images/new-review.png) 
+In the Body field, type, “This book is lovely!”
+![Add Review](images/create-review.png) 
+Click on *Create Review*. You will be redirected to the `index` view for all review that belong to this book:
+![Review Index](images/review-index.png) 
+With our review resources working, we can now test our data validations to ensure that only desired data gets saved to the database.
+From the index view, click on New review. In the Body field of the new form, try entering “These books are scary!” again:
+Click on Create review. You will see the following error:
+    Repeat book review
+ 
+    Click on Back to return to the main review page.
+To test our other validation, click on New review again. Leave the review blank and click Create review. You will see the following error:
+ Unique review Error
+  
+   With your nested resources and validations working properly, you now have a working Rails application that you can use as a starting point for further development.
+Conclusion
+With your Rails application in place, you can now work on things like styling and developing other front-end components. If you would like to learn more about routing and nested resources, the Rails documentation is a great place to start.
+To learn more about integrating front-end frameworks with your application, take a look at How To Set Up a Ruby on Rails Project with a React Frontend.
+    Blank review Error
+  
+How To Add Stimulus to a Ruby on Rails Application
+Written by Kathleen Juell
+If you are working with a Ruby on Rails project, your requirements may include some interactivity with the HTML generated by your view templates. If so, you have a few choices for how to implement this interactivity.
+For example, you could implement a JavaScript framework like React or Ember. If your requirements include handling state on the client side, or if you are concerned about performance issues associated with frequent queries to the server, then choosing one of these frameworks may make sense. Many Single Page Applications (SPAs) take this approach.
+However, there are several considerations to keep in mind when implementing a framework that manages state and frequent updates on the client side: 1. It's possible for loading and conversion requirements — things like parsing JavaScript, and fetching and converting JSON to HTML — to limit performance. 2. Commitment to a framework may involve writing more code than your particular use case requires, particularly if you are looking for small-scale JavaScript enhancements. 3. State managed on both the client and server side can lead to a duplication of efforts, and increases the surface area for errors.
+As an alternative, the team at Basecamp (the same team that wrote Rails) has created Stimulus.js, which they describe as “a modest JavaScript
+         
+ framework for the HTML you already have.” Stimulus is meant to enhance a modern Rails application by working with server-side generated HTML. State lives in the Document Object Model (DOM), and the framework offers standard ways of interacting with elements and events in the DOM. It works side by side with Turbolinks (included in Rails 5+ by default) to improve performance and load times with code that is limited and scoped to a clearly defined purpose.
+In this tutorial, you will install and use Stimulus to build on an existing Rails application that offers readers information about books. The application already has a model for handling book data, but you will add a nested resource for review about individual books, allowing users to build out a body of thoughts and opinions about books. This piece runs roughly parallel to How To Create Nested Resources for a Ruby on Rails Application, except that we will be using JavaScript to manipulate the position and appearance of review on the page. We will also take a slightly different approach to building out the review model itself.
+Prerequisites
+To follow this tutorial, you will need: - A local machine or development server running Ubuntu 18.04. Your development machine should have a non-root user with administrative privileges and a firewall configured with
+ufw . For instructions on how to set this up, see our Initial Server Setup with Ubuntu 18.04 tutorial. - Node.js and npm installed on your local machine or
+development server. This tutorial uses Node.js version <>10.16.3<> and npm version <>6.9.0<>. For guidance on installing Node.js and npm on Ubuntu
+       
+ 18.04, follow the instructions in the “Installing Using a PPA” section of How To Install Node.js on Ubuntu 18.04. - Ruby, rbenv, and Rails installed on your local machine or development server, following Steps 1-4 in How To Install Ruby on Rails with rbenv on Ubuntu 18.04. This tutorial uses Ruby <>2.5.1<>, rbenv <>1.1.2<>, and Rails <>5.2.3<>. - SQLite installed, and a basic book information application created, following the directions in How To Build a Ruby on Rails Application.
+Step 1 — Creating a Nested Model
+Our first step will be to create a nested review model, which we will associate with our existing book model. We will do this by creating Active Record associations between our models: review will belong to particular books, and each book can have multiple review.
+To get started, navigate to the bookapp directory that you created for your Rails project in the prerequisites:
+To create our review model, we'll use the rails generate command with the model generator. Type the following command to create the model:
+With body:text, we're telling Rails to include a body field in the review database table — the table that maps to the review model. We're also including the :references keyword, which sets up an association between
+            cd bookapp
+     rails generate model review body:text book:references
+     
+ the book and review models. Specifically, this will ensure that a foreign key representing each book entry in the books database is added to the review database.
+Once you have run the command, you will see output confirming the resources that Rails has generated for the application. Before moving on, you can check your database migration file to look at the relationship that now exists between your models and database tables. Use the following command to look at the contents of the file, making sure to substitute the timestamp on your own migration file for what's shown here:
+You will see the following output:
+       cat db/migrate/20190805132506_create_review.rb
+ Output
+  class Createreview < ActiveRecord::Migration[5.2]
+  def change
+create_table :review do |t|
+t.text :body
+t.references :book, foreign_key: true
+      t.timestamps
+    end
+end end
+
+  model_name_id
+book_id
+ review
+  cat app/models/review.rb
+ Output
+  class review < ApplicationRecord
+  belongs_to :book
+end
+ belongs_to
+     belongs_to
+has_many
+book
+review book
+       app/models/sha
+ has_many
+ nano
+    rk.rb
+  nano app/models/book.rb
+ As you can see, the table includes a column for a book foreign key. This key will take the form of — in our case, .
+Rails has established the relationship between the models elsewhere as well. Take a look at the newly generated model with the following command:
+The association sets up a relationship between models in which a single instance of the declaring model belongs to a single instance of the named model. In the case of our application, this means that a single review belongs to a single book.
+Though Rails has already set the association in our model, we will need to specify a association in our model as well in order for that relationship to function properly.
+To add the association to the model, open using or your favorite editor:
+ 
+ Add the following line to the file to establish the relationship between books and review:
+ ~/bookapp/app/models/book.rb
+  class book < ApplicationRecord
+  has_many :review
+  validates :name, presence: true, uniqueness: true
+  validates :facts, presence: true
+end
+One thing that is worth thinking about here is what happens to review once a particular book is deleted. We likely do not want the review associated with a deleted book persisting in the database. To ensure that any review associated with a given book are eliminated when that book is deleted, we can include the dependent option with the association.
+Add the following code to the file to ensure that the destroy action on a given book deletes any associated review:
+   ~/bookapp/app/models/book.rb
+  class book < ApplicationRecord
+has_many :review, dependent: :destroy
+validates :name, presence: true, uniqueness: true validates :facts, presence: true
+end
+  
+ Once you have finished making these changes, save and close the file. If you are working with nano , do this by pressing CTRL+X , Y , then ENTER .
+You now have a model generated for your review, but you will also need a controller to coordinate between the data in your database and the HTML that's generated and presented to users.
+Step 2 — Creating a Controller for a Nested Resource
+Creating a review controller will involve setting a nested resource route in the application's main routing file and creating the controller file itself to specify the methods we want associated with particular actions.
+To begin, open your config/routes.rb file to establish the relationship between your resourceful routes:
+Currently, the file looks like this:
+       nano config/routes.rb
+  ~/bookapp/config/routes.rb
+ Rails.application.routes.draw do
+  resources :books
+  root 'books#index'
+  # For details on the DSL available within this file, see htt
+p://guides.rubyonrails.org/routing.html
+end
+ 
+  We want to create a dependent relationship relationship between book and post resources. To do this, update your route declaration to make :books the parent of :review . Update the code in the file to look like the following:
+    ~/bookapp/config/routes.rb
+  Rails.application.routes.draw do resources :books do
+    resources :review
+  end
+  root 'books#index'
+  # For details on the DSL available within this file, see htt
+p://guides.rubyonrails.org/routing.html
+end
+Save and close the file when you are finished editing.
+Next, create a new file called app/controllers/review_controller.rb for the controller:
+In this file, we'll define the methods that we will use to create and destroy individual review. However, because this is a nested model, we'll also want to create a local instance variable, @book, that we can use to associate particular review with specific books.
+   nano app/controllers/review_controller.rb
+ 
+ First, we can create the reviewController class itself, along with two
+te methods: get_book , which will allow us to reference a particular book, and post_params, which gives us access to user-submitted information by way of the params method.
+Add the following code to the file:
+      ~/bookapp/app/controllers/review_controller.rb
+  class reviewController < ApplicationController
+  before_action :get_book
+private
+  def get_book
+    @book = book.find(params[:book_id])
+end
+  def post_params
+    params.require(:post).permit(:body, :book_id)
+end end
+You now have methods to get the particular book instances with which your review will be associated, using the :book_id key, and the data that users are inputting to create review. Both of these objects will now be
+   priva
+  
+ available for the methods you will define to handle creating and destroying review.
+Next, above the private methods, add the following code to the file to define your create and destroy methods:
+    ~/bookapp/app/controllers/review_controller.rb
+  .. .
+def create
+    @post = @book.review.create(post_params)
+  end
+  def destroy
+    @post = @book.review.find(params[:id])
+    @post.destroy
+end .. .
+These methods associate @post instances with particular @book instances, and use the collection methods that became available to us when we created the has_many association between books and review. Methods such as find and create allow us to target the collection of review associated with a particular book.
+The finished file will look like this:
+       
+   Save and close the file when you are finished editing.
+~/bookapp/app/controllers/review_controller.rb
+ class reviewController < ApplicationController
+  before_action :get_book
+  def create
+    @post = @book.review.create(post_params)
+end
+  def destroy
+    @post = @book.review.find(params[:id])
+    @post.destroy
+end
+private
+  def get_book
+    @book = book.find(params[:book_id])
+end
+  def post_params
+    params.require(:post).permit(:body, :book_id)
+end end
+
+  With your controller and model in place, you can begin thinking about your view templates and how you will organize your application's generated HTML.
