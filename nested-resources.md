@@ -699,19 +699,18 @@ In the Body field, type, “This book is lovely!”
 Click on *Create Review*. You will be redirected to the `index` view for all review that belong to this book:
 ![Review Index](images/review-index.png) 
 With our review resources working, we can now test our data validations to ensure that only desired data gets saved to the database.
-From the index view, click on New review. In the Body field of the new form, try entering “These books are scary!” again:
-Click on Create review. You will see the following error:
-    Repeat book review
- 
-    Click on Back to return to the main review page.
-To test our other validation, click on New review again. Leave the review blank and click Create review. You will see the following error:
- Unique review Error
-  
-   With your nested resources and validations working properly, you now have a working Rails application that you can use as a starting point for further development.
-Conclusion
-With your Rails application in place, you can now work on things like styling and developing other front-end components. If you would like to learn more about routing and nested resources, the Rails documentation is a great place to start.
-To learn more about integrating front-end frameworks with your application, take a look at How To Set Up a Ruby on Rails Project with a React Frontend.
-    Blank review Error
+
+From the index view, click on *New Review*. In the *Body* field of the new form, try entering “This book is lovely!” again:
+![Add Review](images/create-review.png)
+Click on *Create Review*. You will see the following error:
+![Add Review](images/body-validation.png)
+Click on *Back* to return to the main review page.
+
+To test our other validation, click on *New Review* again. Leave the review blank and click *Create Review*. You will see the following error:
+![Add Review](images/body-validation2.png)
+With your nested resources and validations working properly, you now have a working Rails application that you can use as a starting point for further development.
+
+With your Rails application in place, you can now work on things like styling and developing other front-end components!
   
 How To Add Stimulus to a Ruby on Rails Application
 Written by Kathleen Juell
