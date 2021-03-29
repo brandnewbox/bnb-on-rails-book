@@ -8,148 +8,303 @@ However, there are several considerations to keep in mind when implementing a fr
 
 As an alternative, the team at [Basecamp](https://basecamp.com/) (the same team that wrote Rails) has created [Stimulus.js](https://stimulusjs.org/), which they describe as “a modest JavaScript framework for the HTML you already have.” Stimulus is meant to enhance a modern Rails application by working with server-side generated HTML. State lives in the [Document Object Model (DOM)](https://www.digitalocean.com/community/tutorial_series/understanding-the-dom-document-object-model), and the framework offers standard ways of interacting with elements and events in the DOM. It works side by side with [Turbolinks](https://github.com/turbolinks/turbolinks) (included in Rails 5+ by default) to improve performance and load times with code that is limited and scoped to a clearly defined purpose.
 
-In this tutorial, you will install and use Stimulus to build on an existing Rails application that offers readers information about books. The application already has a model for handling book data, but you will add a nested resource for review about individual books, allowing users to build out a body of thoughts and opinions about books. This piece runs roughly parallel to [Nested Resources](./nested-resources.md), except that we will be using JavaScript to manipulate the position and appearance of review on the page. We will also take a slightly different approach to building out the review model itself.
+In this tutorial, you will install and use Stimulus to build on an existing Rails application that offers readers information about books. The application already has a model for handling book data, but you will add a nested resource for review about individual books, allowing users to build out a body of thoughts and opinions about books. This piece runs roughly parallel to [Nested Resources](./nested-resources.md), except that we will be using JavaScript to manipulate the position and appearance of reviews on the page. We will also take a slightly different approach to building out the review model itself.
 
-## Step 1 — Creating a Nested Model
-Our first step will be to create a nested review model, which we will associate with our existing book model. We will do this by creating Active Record associations between our models: review will belong to particular books, and each book can have multiple review.
-To get started, navigate to the bookapp directory that you created for your Rails project in the prerequisites:
-To create our review model, we'll use the rails generate command with the model generator. Type the following command to create the model:
-With body:text, we're telling Rails to include a body field in the review database table — the table that maps to the review model. We're also including the :references keyword, which sets up an association between
-            cd bookapp
-     rails generate model review body:text book:references
+## Step 1 — Installing Stimulus
+
+The first step in using Stimulus will be to install and configure our application to work with it. This will include making sure we have the correct dependencies, including the [Yarn](https://yarnpkg.com/) package manager and [Webpacker](https://github.com/rails/webpacker), the gem that will allow us to work with the JavaScript pre-processor and bundler [webpack](https://webpack.js.org/). With these dependencies in place, we will be able to install Stimulus and use JavaScript to manipulate events and elements in the DOM.
+
+Open your project's Gemfile, which lists the gem dependencies for your project:
+```
+bnb-library/Gemfile
+```
+Inside the file, you will see Turbolinks and Webpacker enabled by default:
+```
+# bnb-library/Gemfile
+---------------------
+
+# Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
+gem 'webpacker', '~> 5.0'
+# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
+gem 'turbolinks', '~> 5'
+```
+Turbolinks is designed to improve performance by optimizing page loads: instead of having link clicks navigate to a new page, Turbolinks intercepts these click events and makes the page request using [Asynchronous JavaScript and HTML (AJAX)](https://en.wikipedia.org/wiki/Ajax_(programming)). It then replaces the body of the current page and merges the contents of the `<head>` sections, while the JavaScript
+`window` and `document` objects and the `<html>` element persist between renders. This addresses one of the main causes of slow page load times: the reloading of CSS and JavaScript resources.
+
+Webpacker has created two new directories in your project's `app` directory, the directory where your main application code is located. The parent directory, `app/javascript`, will be where your project's
+JavaScript code will live, and it will have the following structure:
+```  
+# app/javascript
+----------------
+
+├── javascript
+│   ├── channels
+│   │   ├── consumer.js
+│   │   └── index.js
+│   └── packs
+│       └── application.js
+```
+
+The directory will contain two child directories: `app/javascript/packs`
+, which will have your webpack entry points, and `app/javascript/channels`,
+where you house [Action Cable](https://guides.rubyonrails.org/action_cable_overview.html) channels. When we install Stimulus you will see a auto generated folder of `app/javascript/channels`, this is where you will define your Stimulus [controllers](https://stimulusjs.org/reference/controllers). 
+
+We can now install Stimulus with the following command:
+```
+dip rails webpacker:install:stimulus
+```
+You will see output like the following, indicating that the installation was successful:
+```
+# Output
+--------
+
+Starting bnb-library_postgres_1 ... done
+Appending Stimulus setup code to /app/app/javascript/packs/application.js
+      append  app/javascript/packs/application.js
+Creating controllers directory
+      create  app/javascript/controllers
+      create  app/javascript/controllers/hello_controller.js
+      create  app/javascript/controllers/index.js
+Installing all Stimulus dependencies
+         run  yarn add stimulus from "."
+yarn add v1.22.10
+[1/4] Resolving packages...
+[2/4] Fetching packages...
+info fsevents@2.3.2: The platform "linux" is incompatible with this module.
+info "fsevents@2.3.2" is an optional dependency and failed compatibility check. Excluding it from installation.
+info fsevents@1.2.13: The platform "linux" is incompatible with this module.
+info "fsevents@1.2.13" is an optional dependency and failed compatibility check. Excluding it from installation.
+[3/4] Linking dependencies...
+warning " > webpack-dev-server@3.11.2" has unmet peer dependency "webpack@^4.0.0 || ^5.0.0".
+warning "webpack-dev-server > webpack-dev-middleware@3.7.3" has unmet peer dependency "webpack@^4.0.0 || ^5.0.0".
+[4/4] Building fresh packages...
+success Saved lockfile.
+success Saved 5 new dependencies.
+info Direct dependencies
+└─ stimulus@2.0.0
+info All dependencies
+├─ @stimulus/core@2.0.0
+├─ @stimulus/multimap@2.0.0
+├─ @stimulus/mutation-observers@2.0.0
+├─ @stimulus/webpack-helpers@2.0.0
+└─ stimulus@2.0.0
+Done in 13.31s.
+Webpacker now supports Stimulus.js 🎉
+```
+You now have Stimulus installed and ready to use in your application. Next, we'll build out our views using Stimulus controllers, targets, and
+actions.
+
+## Step 5 — Using Stimulus in Rails Partials
+ 
+  Our books/posts partial will use the form_with form helper to create a new review object. It will also make use of Stimulus's three core concepts:
+controllers, targets, and actions. These concepts work as follows: - Controllers are JavaScript classes that are defined in JavaScript modules and exported as the module's default object. Through controllers, you have access to particular HTML elements and the Stimulus Application instance defined in app/javascript/packs/application.js. - Targets allow you to reference particular HTML elements by name, and are associated with particular controllers. - Actions control how DOM events are handled by controllers, and are also associated with particular controllers. They create a connection between the HTML element associated with the controller, the methods defined in the controller, and a DOM event listener.
+In our partial, we're first going to build a form as we normally would using Rails. We will then add a Stimulus controller, action, and targets to the form in order to use JavaScript to control how new posts get added to the page.
+First, create a new file for the partial:
+Inside the file, add the following code to create a new review object using the form_with helper:
+      nano app/views/books/_posts.html.erb
+
+     ~/sharkapp/app/views/books/_posts.html.erb
+         <%= form_with model: [@shark, @shark.posts.build] do |
+form| %>
+ost here" %>
+<%= form.text_area :body, placeholder: "Your p
+<br>
+        <%= form.submit %>
+<% end %>
+So far, this form behaves like a typical Rails form, using the form_with helper to build a review object with the fields defined for the Review model. Thus, the form has a field for the review :body , to which we've added a
+with a prompt for filling in a review.
+Additionally, the form is scoped to take advantage of the collection methods that come with the associations between the Shark and Review models. In this case, the new review object that's created from user-submitted data will belong to the collection of posts associated with the shark we're currently viewing.
+Our goal now is to add some Stimulus controllers, events, and actions to control how the review data gets displayed on the page. The user will ultimately submit review data and see it posted to the page thanks to a Stimulus action.
+First, we'll add a controller to the form called posts in a <div> element:
+      place
+    holder
      
- the book and review models. Specifically, this will ensure that a foreign key representing each book entry in the books database is added to the review database.
-Once you have run the command, you will see output confirming the resources that Rails has generated for the application. Before moving on, you can check your database migration file to look at the relationship that now exists between your models and database tables. Use the following command to look at the contents of the file, making sure to substitute the timestamp on your own migration file for what's shown here:
-You will see the following output:
-       cat db/migrate/20190805132506_create_review.rb
- Output
-  class Createreview < ActiveRecord::Migration[5.2]
-  def change
-create_table :review do |t|
-t.text :body
-t.references :book, foreign_key: true
-      t.timestamps
-    end
-end end
-
-  model_name_id
-book_id
- review
-  cat app/models/review.rb
- Output
-  class review < ApplicationRecord
-  belongs_to :book
-end
- belongs_to
-     belongs_to
-has_many
-book
-review book
-       app/models/sha
- has_many
- nano
-    rk.rb
-  nano app/models/book.rb
- As you can see, the table includes a column for a book foreign key. This key will take the form of — in our case, .
-Rails has established the relationship between the models elsewhere as well. Take a look at the newly generated model with the following command:
-The association sets up a relationship between models in which a single instance of the declaring model belongs to a single instance of the named model. In the case of our application, this means that a single review belongs to a single book.
-Though Rails has already set the association in our model, we will need to specify a association in our model as well in order for that relationship to function properly.
-To add the association to the model, open using or your favorite editor:
+   Make sure you add the closing <div> tag to scope the controller properly.
+Next, we'll attach an action to the form that will be triggered by the form submit event. This action will control how user input is displayed on the page. It will reference an addPost method that we will define in the posts Stimulus controller:
+   ~/sharkapp/app/views/books/_posts.html.erb
+ <div data-controller="posts">
+        <%= form_with model: [@shark, @shark.posts.build] do |
+form| %>
+                 <%= form.text_area :body, placeholder: "Your
+ review here" %>
+                 <br>
+                 <%= form.submit %>
+        <% end %>
+</div>
+~/sharkapp/app/views/books/_posts.html.erb
+ <div data-controller="posts">
+<%= form_with model: [@shark, @shark.posts.build], dat
+a: { action: "posts#addBody" } do |form| %> .. .
+                 <%= form.submit %>
+        <% end %>
+</div>
  
- Add the following line to the file to establish the relationship between books and review:
- ~/bookapp/app/models/book.rb
-  class book < ApplicationRecord
-  has_many :review
-  validates :name, presence: true, uniqueness: true
-  validates :facts, presence: true
-end
-One thing that is worth thinking about here is what happens to review once a particular book is deleted. We likely do not want the review associated with a deleted book persisting in the database. To ensure that any review associated with a given book are eliminated when that book is deleted, we can include the dependent option with the association.
-Add the following code to the file to ensure that the destroy action on a given book deletes any associated review:
-   ~/bookapp/app/models/book.rb
-  class book < ApplicationRecord
-has_many :review, dependent: :destroy
-validates :name, presence: true, uniqueness: true validates :facts, presence: true
-end
-  
- Once you have finished making these changes, save and close the file. If you are working with nano , do this by pressing CTRL+X , Y , then ENTER .
-You now have a model generated for your review, but you will also need a controller to coordinate between the data in your database and the HTML that's generated and presented to users.
-Step 2 — Creating a Controller for a Nested Resource
-Creating a review controller will involve setting a nested resource route in the application's main routing file and creating the controller file itself to specify the methods we want associated with particular actions.
-To begin, open your config/routes.rb file to establish the relationship between your resourceful routes:
-Currently, the file looks like this:
-       nano config/routes.rb
-  ~/bookapp/config/routes.rb
- Rails.application.routes.draw do
-  resources :books
-  root 'books#index'
-  # For details on the DSL available within this file, see htt
-p://guides.rubyonrails.org/routing.html
-end
- 
-  We want to create a dependent relationship relationship between book and post resources. To do this, update your route declaration to make :books the parent of :review . Update the code in the file to look like the following:
-    ~/bookapp/config/routes.rb
-  Rails.application.routes.draw do resources :books do
-    resources :review
-  end
-  root 'books#index'
-  # For details on the DSL available within this file, see htt
-p://guides.rubyonrails.org/routing.html
-end
-Save and close the file when you are finished editing.
-Next, create a new file called app/controllers/review_controller.rb for the controller:
-In this file, we'll define the methods that we will use to create and destroy individual review. However, because this is a nested model, we'll also want to create a local instance variable, @book, that we can use to associate particular review with specific books.
-   nano app/controllers/review_controller.rb
- 
- First, we can create the reviewController class itself, along with two
-te methods: get_book , which will allow us to reference a particular book, and post_params, which gives us access to user-submitted information by way of the params method.
-Add the following code to the file:
-      ~/bookapp/app/controllers/review_controller.rb
-  class reviewController < ApplicationController
-  before_action :get_book
-private
-  def get_book
-    @book = book.find(params[:book_id])
-end
-  def post_params
-    params.require(:post).permit(:body, :book_id)
-end end
-You now have methods to get the particular book instances with which your review will be associated, using the :book_id key, and the data that users are inputting to create review. Both of these objects will now be
-   priva
-  
- available for the methods you will define to handle creating and destroying review.
-Next, above the private methods, add the following code to the file to define your create and destroy methods:
-    ~/bookapp/app/controllers/review_controller.rb
+ We use the :data option with form_with to submit the Stimulus action as an additional HTML data attribute. The action itself has a value called an
+action descriptor made up of the following: - The DOM event to listen for. Here, we are using the default event associated with form elements, submit, so we do not need to specify the event in the descriptor itself. For more information about common element/event pairs, see the Stimulus documentation. - The controller identifier, in our case posts. - The method that the event should invoke. In our case, this is the addBody method that we will define in the controller.
+Next, we'll attach a data target to the user input defined in the
+rea> element, since we will use this inputted value in the addBody method.
+Add the following :data option to the <textarea> element:
+              :body
+  ~/sharkapp/app/views/books/_posts.html.erb
+  <div data-controller="posts">
+        <%= form_with model: [@shark, @shark.posts.build], dat
+a: { action: "posts#addBody" } do |form| %>
+                <%= form.text_area :body, placeholder: "Your p
+ost here", data: { target: "posts.body" } %> .. .
+Much like action descriptors, Stimulus targets have target descriptors, which include the controller identifier and the target name. In this case, pos ts is our controller, and body is the target itself.
+:body
+<texta
+    
+  As a last step, we'll add a data target for the inputted body values so that users will be able to see their posts as soon as they are submitted.
+Add the following <ul> element with an add target below the form and above the closing <div> :
+    ~/sharkapp/app/views/books/_posts.html.erb
   .. .
-def create
-    @post = @book.review.create(post_params)
-  end
-  def destroy
-    @post = @book.review.find(params[:id])
-    @post.destroy
-end .. .
-These methods associate @post instances with particular @book instances, and use the collection methods that became available to us when we created the has_many association between books and review. Methods such as find and create allow us to target the collection of review associated with a particular book.
-The finished file will look like this:
-       
-   Save and close the file when you are finished editing.
-~/bookapp/app/controllers/review_controller.rb
- class reviewController < ApplicationController
-  before_action :get_book
-  def create
-    @post = @book.review.create(post_params)
-end
-  def destroy
-    @post = @book.review.find(params[:id])
-    @post.destroy
-end
-private
-  def get_book
-    @book = book.find(params[:book_id])
-end
-  def post_params
-    params.require(:post).permit(:body, :book_id)
-end end
+<% end %>
+  <ul data-target="posts.add">
+  </ul>
+</div>
+As with the body target, our target descriptor includes both the name of the controller and the target — in this case, add .
+The finished partial will look like this:
+ 
+   Once you have made these changes, you can save and close the file.
+You have now created one of the two partials you added to the books/show view template. Next, you'll create the second, books/all , which will show all of the older posts from the database.
+Create a new file named _all.html.erb in the app/views/books/ directory:
+Add the following code to the file to iterate through the collection of posts associated with the selected shark:
+      nano app/views/books/_all.html.erb
+~/sharkapp/app/views/books/_posts.html.erb
+ <div data-controller="posts">
+        <%= form_with model: [@shark, @shark.posts.build], dat
+a: { action: "posts#addBody"} do |form| %>
+                <%= form.text_area :body, placeholder: "Your p
+ost here", data: { target: "posts.body" } %>
+                <br>
+                <%= form.submit %>
+        <% end %>
+  <ul data-target="posts.add">
+  </ul>
+</div>
+  
+  This code uses a for loop to iterate through each review instance in the collection of review objects associated with a particular shark.
+We can now add some Stimulus actions to this partial to control the appearance of posts on the page. Specifically, we will add actions that will control upvotes and whether or not posts are visible on the page
+Before we do that, however, we will need to add a gem to our project so that we can work with Font Awesome icons, which we'll use to register upvotes. Open a second terminal window, and navigate to your sharkapp project directory.
+Open your Gemfile:
+   ~/sharkapp/app/views/books/_all.html.erb
+ <% for review in @shark.posts  %>
+    <ul>
+        <li class="review">
+            <%= review.body %>
+</li>
+    </ul>
+    <% end %>
+[environment second]
+nano Gemfile
+  
+ webpacker
+ ~/sharkapp/Gemfile
+  [environment second]
+.. .
+gem 'webpacker', '~> 4.x'
+gem 'font-awesome-rails', '~>4.x' .. .
+ [environment second]
+bundle install
+   app/assets/stylesheets/a
+    pplication.css
+   [environment second]
+nano app/assets/stylesheets/application.css
+   Below your gem, add the following line to include the font-awe some-rails gem in the project:
+  Save and close the file. Next, install the gem:
+Finally, open your application's main stylesheet, :
+Add the following line to include Font Awesome's styles in your project:
 
-  With your controller and model in place, you can begin thinking about your view templates and how you will organize your application's generated HTML.
+  Save and close the file. You can now close your second terminal window.
+Back in your app/views/books/_all.html.erb partial, you can now add two button_tags with associated Stimulus actions, which will be triggered on click events. One button will give users the option to upvote a review and the other will give them the option to remove it from the page view.
+Add the following code to app/views/books/_all.html.erb :
+    ~/sharkapp/app/assets/stylesheets/application.cs
+s
+ [environment second] .. .
+*
+*= require_tree .
+*= require_self
+*= require font-awesome */
+  
+  Button tags also take a :data option, so we've added our posts Stimulus controller and two actions: remove and upvote. Once again, in the action
+descriptors, we only need to define our controller and method, since the default event associated with button elements is click. Clicking on each of these buttons will trigger the respective remove and upvote methods defined in our controller.
+Save and close the file when you have finished editing.
+The final change we will make before moving on to defining our controller is to set a data target and action to control how and when the books/all partial will be displayed.
+      ~/sharkapp/app/views/books/_all.html.erb
+ <% for review in @shark.posts  %>
+    <ul>
+<li class="review">
+<%= review.body %>
+<%= button_tag "Remove Review", data: { controller:
+ "posts", action: "posts#remove" } %>
+            <%= button_tag "Upvote Review", data: { controller:
+ "posts", action: "posts#upvote" } %>
+</li>
+    </ul>
+    <% end %>
+ 
+ Open the show template again, where the initial call to render books/all is currently defined:
+At the bottom of the file, we have a <div> element that currently looks like this:
+    nano app/views/books/show.html.erb
+  ~/sharkapp/app/views/books/show.html.erb
+  .. . <div>
+  <%= render 'books/all' %>
+</div>
+First, add a controller to this <div> element to scope actions and targets:
+  ~/sharkapp/app/views/books/show.html.erb
+  .. .
+<div data-controller="posts">
+  <%= render 'books/all' %>
+</div>
+Next, add a button to control the appearance of the partial on the page. This button will trigger a showAll method in our posts controller.
+Add the button below the <div> element and above the render statement:
+    
+     ~/sharkapp/app/views/books/show.html.erb
+ .. .
+<div data-controller="posts">
+<button data-action="posts#showAll">Show Older Posts</button>
+  <%= render 'books/all' %>
+Again, we only need to identify our posts controller and showAll method here — the action will be triggered by a click event.
+Next, we will add a data target. The goal of setting this target is to control the appearance of the partial on the page. Ultimately, we want users to see older posts only if they have opted into doing so by clicking on the
+button.
+We will therefore attach a data target called show to the books/all partial, and set its default style to visibility:hidden. This will hide the partial unless users opt in to seeing it by clicking on the button.
+Add the following <div> element with the show target and style definition below the button and above the partial render statement:
+     Show Ol
+    der Posts
+       
+  Be sure to add the closing </div> tag.
+The finished show template will look like this:
+  ~/sharkapp/app/views/books/show.html.erb
+ .. .
+<div data-controller="posts">
+<button data-action="posts#showAll">Show Older Posts</button>
+<div data-target="posts.show" style="visibility:hidden">
+  <%= render 'books/all' %>
+</div>
+  
+ ~/sharkapp/app/views/books/show.html.erb
+ <p id="notice"><%= notice %></p>
+<p>
+  <strong>Name:</strong>
+  <%= @shark.name %>
+</p>
+<p>
+  <strong>Facts:</strong>
+  <%= @shark.facts %>
+</p>
+<h2>Posts</h2>
+<%= render 'books/posts' %>
+<%= link_to 'Edit', edit_shark_path(@shark) %> |
+<%= link_to 'Back', sharks_path %>
+<div data-controller="posts">
+<button data-action="posts#showAll">Show Older Posts</button>
+<div data-target="posts.show" style="visibility:hidden">
+  <%= render 'books/all' %>
+ 
+Save and close the file when you are finished editing.
+With this template and its associated partials finished, you can move on to creating the controller with the methods you've referenced in these files.
+
 Step 6 — Creating the Stimulus Controller
 Installing Stimulus created the app/javascript/controllers directory, which is where webpack is loading our application context from, so we will create our posts controller in this directory. This controller will include each of the methods we referenced in the previous step: - addBody() , to add new posts. - showAll() , to show older posts. - remove() , to remove posts from the current view. - upvote() , to attach an upvote icon to posts.
 Create a file called posts_controller.js in the ers directory:
@@ -174,8 +329,8 @@ roller.js
 export default class extends Controller {
 }
  
-    This method defines a content variable with the let keyword and sets it equal to the post input string that users entered into the posts form. It does this by virtue of the body data target that we attached to the <textarea> element in our form. Using this.bodyTarget to match this element, we can then use the value property that is associated with that element to set the value of content as the post input users have entered.
-Next, the method adds this post input to the add target we added to the <ul > element below the form builder in the sharks/posts partial. It does this using the Element.insertAdjacentHTML() method, which will insert the content of the new post, set in the content variable, before the add target element. We've also enclosed the new post in an <li> element, so that new posts appear as bulleted list items.
+    This method defines a content variable with the let keyword and sets it equal to the review input string that users entered into the posts form. It does this by virtue of the body data target that we attached to the <textarea> element in our form. Using this.bodyTarget to match this element, we can then use the value property that is associated with that element to set the value of content as the review input users have entered.
+Next, the method adds this review input to the add target we added to the <ul > element below the form builder in the books/posts partial. It does this using the Element.insertAdjacentHTML() method, which will insert the content of the new review, set in the content variable, before the add target element. We've also enclosed the new review in an <li> element, so that new posts appear as bulleted list items.
               ~/sharkapp/app/javascript/controllers/posts_cont
 roller.js
  .. .
@@ -202,10 +357,10 @@ export default class extends Controller { .. .
         this.showTarget.style.visibility = "visible";
 }
 }
-Here, we again use the this.target-nameTarget property to match our sho w target, which is attached to the <div> element with the sharks/all partial. We gave it a default style, "visibility:hidden" , so in this method, we simply change the style to "visible" . This will show the partial to users who have opted into seeing older posts.
+Here, we again use the this.target-nameTarget property to match our sho w target, which is attached to the <div> element with the books/all partial. We gave it a default style, "visibility:hidden" , so in this method, we simply change the style to "visible" . This will show the partial to users who have opted into seeing older posts.
        
  Below showAll, we'll next add an upvote method, to allow users to “upvote” posts on the page by attaching the free Font Awesome
-le icon to a particular post.
+le icon to a particular review.
 Add the following code to define this method:
     ~/sharkapp/app/javascript/controllers/posts_cont
 roller.js
@@ -215,33 +370,33 @@ export default class extends Controller { .. .
         this.showTarget.style.visibility = "visible";
 }
     upvote() {
-        let post = event.target.closest(".post");
-        post.insertAdjacentHTML('beforeend', '<i class="fa fa-
+        let review = event.target.closest(".review");
+        review.insertAdjacentHTML('beforeend', '<i class="fa fa-
 check-circle"></i>');
     }
 }
-Here, we're creating a post variable that will target the closest <li> element with the class post — the class we attached to each <li> element
+Here, we're creating a review variable that will target the closest <li> element with the class review — the class we attached to each <li> element
       check-circ
   
- in our loop iteration in sharks/all . This will target the closest post and add the check-circle icon just inside <li> element, after its last child.
+ in our loop iteration in books/all . This will target the closest review and add the check-circle icon just inside <li> element, after its last child.
 Next, we'll use a similar method to hide posts on the page. Add the following code below the upvote method to define a remove method:
       ~/sharkapp/app/javascript/controllers/posts_cont
 roller.js
   .. .
 export default class extends Controller { .. .
     upvote() {
-        let post = event.target.closest(".post");
-        post.insertAdjacentHTML('beforeend', '<i class="fa fa-
+        let review = event.target.closest(".review");
+        review.insertAdjacentHTML('beforeend', '<i class="fa fa-
 check-circle"></i>');
     }
     remove() {
-        let post = event.target.closest(".post");
-        post.style.visibility = "hidden";
+        let review = event.target.closest(".review");
+        review.style.visibility = "hidden";
 }
 }
-Once again, our post variable will target the closest <li> element with the class post. It will then set the visibility property to "hidden" to hide the
+Once again, our review variable will target the closest <li> element with the class review. It will then set the visibility property to "hidden" to hide the
     
-  post on the page.
+  review on the page.
 The finished controller file will now look like this:
 
 ~/sharkapp/app/javascript/controllers/posts_cont
@@ -258,20 +413,20 @@ export default class extends Controller {
         this.showTarget.style.visibility = "visible";
 }
     upvote() {
-        let post = event.target.closest(".post");
-        post.insertAdjacentHTML('beforeend', '<i class="fa fa-
+        let review = event.target.closest(".review");
+        review.insertAdjacentHTML('beforeend', '<i class="fa fa-
 check-circle"></i>');
     }
     remove() {
-        let post = event.target.closest(".post");
+        let review = event.target.closest(".review");
  
-         post.style.visibility = "hidden";
+         review.style.visibility = "hidden";
     }
 }
  link_to
 index
  index index
-   nano app/views/sharks/index.html.erb
+   nano app/views/books/index.html.erb
   button_to
 javascript_pack_tag
     vascript_include_tag
