@@ -6,7 +6,6 @@ Input [HAML](https://haml.info/). From their website:
 
 At BNB, we use HAML's indentation-based markup to manage the nesting our HTML nodes for us. No more managing of closing `</div>` tags everywhere!
 ![haml view](images/haml.png)
-We use [haml-rails](https://github.com/haml/haml-rails) as our standard. In the next steps we will be working with views, so to save time and effort, lets convert all of our views to `haml` format.
 
 ## Install haml-rails
 First, open your `Gemfile` and add the `haml-rails` gem: 
