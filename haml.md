@@ -1,6 +1,10 @@
 Working with [ERB](https://www.tutorialspoint.com/ruby-on-rails/rails-and-html-erb.htm) can get the job done, but there are fantasic alternatives to achieve the same result with much less code. 
 
-Input [HAML](https://haml.info/). Haml (HTML abstraction markup language) is based on one primary principle: markup should be beautiful. It’s not just beauty for beauty’s sake either; Haml accelerates and simplifies template creation down to veritable haiku.
+Input [HAML](https://haml.info/). From their website:
+
+> Haml (HTML abstraction markup language) is based on one primary principle: markup should be beautiful. It’s not just beauty for beauty’s sake either; Haml accelerates and simplifies template creation down to veritable haiku.
+
+At BNB, we use HAML's indentation-based markup to manage the nesting our HTML nodes for us. No more managing of closing `</div>` tags everywhere!
 ![haml view](images/haml.png)
 We use [haml-rails](https://github.com/haml/haml-rails) as our standard. In the next steps we will be working with views, so to save time and effort, lets convert all of our views to `haml` format.
 
