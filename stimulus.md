@@ -457,131 +457,395 @@ Save and close the file when you are finished editing.
 With this template and its associated partials finished, you can move on to creating the controller with the methods you've referenced in these files.
 
 ## Step 6 — Creating the Stimulus Controller
-Installing Stimulus created the app/javascript/controllers directory, which is where webpack is loading our application context from, so we will create our reviews controller in this directory. This controller will include each of the methods we referenced in the previous step: - addBody() , to add new reviews. - showAll() , to show older reviews. - remove() , to remove reviews from the current view. - upvote() , to attach an upvote icon to reviews.
-Create a file called posts_controller.js in the ers directory:
-First, at the top of the file, extend Stimulus's built-in Controller class:
-         nano app/javascript/controllers/posts_controller.js
-  </div>
-</div>
-  app/javascript/controll
-     
-    Next, add the following target definitions to the file:
- ~/sharkapp/app/javascript/controllers/posts_cont
-roller.js
-  .. .
-export default class extends Controller {
-    static targets = ["body", "add", "show"]
-}
-Defining targets in this way will allow us to access them in our methods with the this.target-nameTarget property, which gives us the first matching target element. So, for example, to match the body data target defined in our targets array, we would use this.bodyTarget . This property allows us to manipulate things like input values or css styles.
-Next, we can define the addBody method, which will control the appearance of new reviews on the page. Add the following code below the target definitions to define this method:
-    ~/sharkapp/app/javascript/controllers/posts_cont
-roller.js
- import { Controller } from "stimulus"
-export default class extends Controller {
-}
- 
-    This method defines a content variable with the let keyword and sets it equal to the review input string that users entered into the reviews form. It does this by virtue of the body data target that we attached to the <textarea> element in our form. Using this.bodyTarget to match this element, we can then use the value property that is associated with that element to set the value of content as the review input users have entered.
-Next, the method adds this review input to the add target we added to the <ul > element below the form builder in the books/reviews partial. It does this using the Element.insertAdjacentHTML() method, which will insert the content of the new review, set in the content variable, before the add target element. We've also enclosed the new review in an <li> element, so that new reviews appear as bulleted list items.
-              ~/sharkapp/app/javascript/controllers/posts_cont
-roller.js
- .. .
-export default class extends Controller {
-    static targets = [ "body", "add", "show"]
-    addBody() {
-        let content = this.bodyTarget.value;
-        this.addTarget.insertAdjacentHTML('beforebegin', "<li
->" + content + "</li>");
-    }
-}
- 
- Next, below the addBody method, we can add the showAll method, which will control the appearance of older reviews on the page:
-   ~/sharkapp/app/javascript/controllers/posts_cont
-roller.js
-  .. .
-export default class extends Controller { .. .
-    addBody() {
-        let content = this.bodyTarget.value;
-        this.addTarget.insertAdjacentHTML('beforebegin', "<li
->" + content + "</li>");
-    }
-    showAll() {
-        this.showTarget.style.visibility = "visible";
-}
-}
-Here, we again use the this.target-nameTarget property to match our sho w target, which is attached to the <div> element with the books/all partial. We gave it a default style, "visibility:hidden" , so in this method, we simply change the style to "visible" . This will show the partial to users who have opted into seeing older reviews.
-       
- Below showAll, we'll next add an upvote method, to allow users to “upvote” reviews on the page by attaching the free Font Awesome
-le icon to a particular review.
-Add the following code to define this method:
-    ~/sharkapp/app/javascript/controllers/posts_cont
-roller.js
-  .. .
-export default class extends Controller { .. .
-    showAll() {
-        this.showTarget.style.visibility = "visible";
-}
-    upvote() {
-        let review = event.target.closest(".review");
-        review.insertAdjacentHTML('beforeend', '<i class="fa fa-
-check-circle"></i>');
-    }
-}
-Here, we're creating a review variable that will target the closest <li> element with the class review — the class we attached to each <li> element
-      check-circ
-  
- in our loop iteration in books/all . This will target the closest review and add the check-circle icon just inside <li> element, after its last child.
-Next, we'll use a similar method to hide reviews on the page. Add the following code below the upvote method to define a remove method:
-      ~/sharkapp/app/javascript/controllers/posts_cont
-roller.js
-  .. .
-export default class extends Controller { .. .
-    upvote() {
-        let review = event.target.closest(".review");
-        review.insertAdjacentHTML('beforeend', '<i class="fa fa-
-check-circle"></i>');
-    }
-    remove() {
-        let review = event.target.closest(".review");
-        review.style.visibility = "hidden";
-}
-}
-Once again, our review variable will target the closest <li> element with the class review. It will then set the visibility property to "hidden" to hide the
-    
-  review on the page.
-The finished controller file will now look like this:
+Installing Stimulus created the `app/javascript/controllers` directory, which is where webpack is loading our application context from, so we will create our reviews controller in this directory. This controller will include each of the methods we referenced in the previous step: 
+- `addBody()`, to add new reviews. 
+- `showAll()`, to show older reviews. 
+- `remove()`, to remove reviews from the current view. 
+- `upvote()`, to attach an upvote icon to reviews.
 
-~/sharkapp/app/javascript/controllers/posts_cont
-roller.js
-   import { Controller } from "stimulus"
+Create a file called reviews_controller.js in the `app/javascript/controllers` directory:
+```rb
+# app/javascript/controllers/reviews_controller.js
+```
+First, at the top of the file, extend Stimulus's built-in `Controller` class:
+```js
+# app/javascript/controllers/reviews_controller.js
+--------------------------------------------------
+
+import { Controller } from "stimulus"
+
 export default class extends Controller {
-    static targets = ["body", "add", "show"]
-    addBody() {
-        let content = this.bodyTarget.value;
-        this.addTarget.insertAdjacentHTML('beforebegin', "<li
->" + content + "</li>");
-    }
-    showAll() {
-        this.showTarget.style.visibility = "visible";
+
 }
-    upvote() {
-        let review = event.target.closest(".review");
-        review.insertAdjacentHTML('beforeend', '<i class="fa fa-
-check-circle"></i>');
-    }
-    remove() {
-        let review = event.target.closest(".review");
+```
+Next, add the following target definitions to the file:
+```js
+# app/javascript/controllers/reviews_controller.js
+--------------------------------------------------
+
+import { Controller } from "stimulus"
+
+export default class extends Controller {
+  static targets = ["body", "add", "show"]
+
+}
+```
+Defining targets in this way will allow us to access them in our methods with the `this.target-nameTarget` property, which gives us the first matching target element. So, for example, to match the `body` data target defined in our targets array, we would use `this.bodyTarget`. This property allows us to manipulate things like input values or css styles.
+
+Next, we can define the `addBody` method, which will control the appearance of new reviews on the page. Add the following code below the target definitions to define this method:
+```js
+# app/javascript/controllers/reviews_controller.js
+--------------------------------------------------
+
+import { Controller } from "stimulus"
+
+export default class extends Controller {
+  static targets = ["body", "add", "show"]
+
+  addBody() {
+    let content = this.bodyTarget.value;
+    this.addTarget.insertAdjacentHTML('beforebegin', "<li>" + content + "</li>");
+  }
+}
+```
+This method defines a content variable with the [let keyword](https://www.digitalocean.com/community/tutorials/understanding-variables-scope-hoisting-in-javascript#difference-between-var,-let,-and-const) and sets it equal to the review input string that users entered into the reviews form. It does this by virtue of the `body` data target that we attached to the `<textarea>` element in our form. Using `this.bodyTarget` to match this element, we can then use the [value property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement) that is associated with that element to set the value of `content` as the review input users have entered.
+
+Next, the method adds this review input to the `add` target we added to the `<ul>` element below the form builder in the `books/reviews` partial. It does this using the [Element.insertAdjacentHTML() method](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML), which will insert the content of the new review, set in the `content` variable, before the `add` target element. We've also enclosed the new review in an `<li>` element, so that new reviews appear as bulleted list items.
+
+Next, below the `addBody` method, we can add the `showAll` method, which will control the appearance of older reviews on the page:
+```js
+# app/javascript/controllers/reviews_controller.js
+--------------------------------------------------
+
+import { Controller } from "stimulus"
+
+export default class extends Controller {
+  static targets = ["body", "add", "show"]
+
+  addBody() {
+    let content = this.bodyTarget.value;
+    this.addTarget.insertAdjacentHTML('beforebegin', "<li>" + content + "</li>");
+  }
+
+  showAll() {
+    this.showTarget.style.visibility = "visible";
+  }
+}
+```
+Here, we again use the `this.target-nameTarget` property to match our `show` target, which is attached to the `<div>` element with the `books/all` partial. We gave it a default style, `"visibility:hidden"`, so in this method, we simply change the style to `"visible"`. This will show the partial to users who have opted into seeing older reviews.
+       
+Below `showAll`, we'll next add an `upvote` method, to allow users to “upvote” reviews on the page by attaching the [free](https://fontawesome.com/icons?d=gallery&m=free) Font Awesome `check-circle` icon to a particular review.
+
+Add the following code to define this method:
+```js
+# app/javascript/controllers/reviews_controller.js
+--------------------------------------------------
+
+export default class extends Controller {
+
+  showAll() {
+    this.showTarget.style.visibility = "visible";
+  }
+
+  upvote() {
+    let review = event.target.closest(".review");
+    review.insertAdjacentHTML('beforeend', '<i class="fa fa-check-circle"></i>');
+  }
+}
+```
+Here, we're creating a `review` variable that will target the closest `<li>` element with the class `review` — the class we attached to each `<li>` element in our loop iteration in `books/all`. This will target the closest review and add the `check-circle` icon just inside `<li>` element, after its last child.
+
+Next, we'll use a similar method to hide reviews on the page. Add the following code below the `upvote` method to define a `remove` method:
+```js
+# app/javascript/controllers/reviews_controller.js
+--------------------------------------------------
+
+export default class extends Controller {
+  upvote() {
+    let review = event.target.closest(".review");
+    review.insertAdjacentHTML('beforeend', '<i class="fa fa-check-circle"></i>');
+  }
+
+  remove() {
+    let review = event.target.closest(".review");
+    review.style.visibility = "hidden";
+  }
+}
+```
+Once again, our `review` variable will target the closest `<li>` element with the class `review`. It will then set the visibility property to `"hidden"` to hide the review on the page.
+
+The finished controller file will now look like this:
+```js
+# app/javascript/controllers/reviews_controller.js
+--------------------------------------------------
+
+import { Controller } from "stimulus"
+
+export default class extends Controller {
+  static targets = ["body", "add", "show"]
+
+  addBody() {
+    let content = this.bodyTarget.value;
+    this.addTarget.insertAdjacentHTML('beforebegin', "<li>" + content + "</li>");
+  }
+
+  showAll() {
+    this.showTarget.style.visibility = "visible";
+  }
+
+  upvote() {
+    let review = event.target.closest(".review");
+    review.insertAdjacentHTML('beforeend', '<i class="fa fa-check-circle"></i>');
+  }
+
+  remove() {
+    let review = event.target.closest(".review");
+    review.style.visibility = "hidden";
+  }
+}
+```
+Save and close the file when you are finished editing.
+
+With your Stimulus controller in place, you can move on to making some final changes to the `index` view and testing your application.
+
+## Step 7 — Modifying the Index View and Testing the Application
+With one final change to the sharks view you will be ready to test out your application. The view is the root of the application, which you set in Step 4 of How To Build a Ruby on Rails Application.
+Open the file:
+In place of the helpers that were autogenerated for us to display and destroy sharks, we'll use helpers. This will help us work with generated HTML code instead of the default Rails JavaScript assets, which we specified we would no longer use in Step 1, when we changed ja
+to in .
+   
+ Replace the existing link_to helpers in the file with the following to helpers:
+   ~/sharkapp/app/views/sharks/index.html.erb
+  .. . <tbody>
+    <% @sharks.each do |shark| %>
+      <tr>
+<td><%= shark.name %></td>
+<td><%= shark.facts %></td>
+<td><%= button_to 'Show', shark_path(:id => shark.id),
+:method => :get %></td>
+<td><%= button_to 'Edit', edit_shark_path(:id => shar
+k.id), :method => :get %></td>
+<td><%= button_to 'Destroy', shark_path(:id => shark.i
+d), :method => :delete %></td> </tr>
+    <% end %>
+  </tbody>
+.. .
+These helpers accomplish much the same things as their link_to counterparts, but the Destroy helper now relies on generated HTML rather than Rails's default JavaScript.
+Save and close the file when you are finished editing.
+    button_
+  
+ You are now ready to test your application. First, run your database migrations:
+Next, start your server. If you are working locally, you can do this with the following command:
+If you are working on a development server, you can start the application with:
+Navigate to the application landing page in your browser. If you are working locally, this will be localhost:3000 , or
+000 if you are working on a server.
+You will see the following landing page:
+  rails db:migrate
+  rails s
+  rails s --binding=your_server_ip
+    http://your_server_ip:3
+   
+    Clicking on Show will take you to the show view for this shark. Here you will see a form to fill out a post:
+In the post form, type “These sharks are scary!”:
+    Shark Show Page
+  Application Landing Page
+  
+  Click on Create Post. You will now see the new post on the page:
+   New Post Added to Page
+  Filled in Post
+   
+ You can add another new post, if you would like. This time, type “These sharks are often misrepresented in films” and click Create Post:
+In order to test the functionality of the Show Older Posts feature, we will need to leave this page, since our Great White does not currently have any posts that are older than the ones we've just added.
+Click Back to get to the main page, and then Show to return to the Great White landing page:
+   Second Post Added to Page
+  
+   Clicking on Show Older Posts will now show you the posts you created:
+   Show Older Posts
+ You can now upvote a post by clicking on the Upvote Post button:
+ Shark Show Page
+   
+   Similarly, clicking Remove Post will hide the post:
+You have now confirmed that you have a working Rails application that uses Stimulus to control how nested post resources are displayed on
+   Remove a Post
+  Upvote a Post
+  
+ individual shark pages. You can use this as the jumping off point for future development and experimentation with Stimulus.
+Conclusion
+Stimulus represents a possible alternative to working with rails-ujs, JQuery, and frameworks like React and Vue.
+As discussed in the introduction, Stimulus makes the most sense when you need to work directly with HTML generated by the server. It is lightweight, and aims to make code – particularly HTML – self-explanatory to the highest degree possible. If you don't need to manage state on the client side, then Stimulus may be a good choice.
+If you are interested in how to create nested resources without a Stimulus integration, you can consult How To Create Nested Resources for a Ruby on Rails Application.
+For more information on how you would integrate React with a Rails application, see How To Set Up a Ruby on Rails Project with a React Frontend.
+      
+ How To Add Bootstrap to a Ruby on Rails Application
+Written by Kathleen Juell
+If you are developing a Ruby on Rails application, you may be interested in adding styles to your project to facilitate user engagement. One way to do this is by adding Bootstrap, an HTML, CSS, and JavaScript framework designed to simplify the process of making web projects responsive and mobile ready. By implementing Bootstrap in a Rails project, you can integrate its layout conventions and components into your application to make user interactions with your site more engaging.
+In this tutorial, you will add Bootstrap to an existing Rails project that uses the webpack bundler to serve its JavaScript and CSS assets. The goal will be to create a visually appealing site that users can interact with to share information about sharks:
+     
+  Prerequisites
+To follow this tutorial, you will need: - A local machine or development server running Ubuntu 18.04. Your development machine should have a non-root user with administrative privileges and a firewall configured with
+ufw . For instructions on how to set this up, see our Initial Server Setup with Ubuntu 18.04 tutorial. - Node.js and npm installed on your local machine or
+development server. This tutorial uses Node.js version <>10.16.3<> and npm version <>6.9.0<>. For guidance on installing Node.js and npm on Ubuntu 18.04, follow the instructions in the “Installing Using a PPA” section of How To Install Node.js on Ubuntu 18.04. - Ruby, rbenv, and Rails installed on your local machine or development server, following Steps 1-4 in How To Install Ruby on Rails with rbenv on Ubuntu 18.04. This tutorial uses Ruby <>2.5.1<>, rbenv <>1.1.2<>, and Rails <>5.2.3<>. - SQLite installed, following
+       Application Landing Page
+   
+ Step 1 of How To Build a Ruby on Rails Application. This tutorial uses SQLite 3 <>3.22.0<>.
+Step 1 — Cloning the Project and Installing Dependencies
+Our first step will be to clone the rails-stimulus repository from the DigitalOcean Community GitHub account. This repository includes the code from the setup described in How To Add Stimulus to a Ruby on Rails Application, which described how to add Stimulus.js to an existing Rails 5 project.
+Clone the repository into a directory called rails-bootstrap :
+Navigate to the rails-bootstrap directory:
+In order to work with the project code, you will first need to install the project's dependencies, which are listed in its Gemfile. Use the following command to install the required gems:
+        git clone https://github.com/do-community/rails-stimulus.git r ails-bootstrap
+    cd rails-bootstrap
+  bundle install
+
+  Next, you will install your Yarn dependencies. Because this Rails 5 project has been modified to serve assets with webpack, its JavaScript dependencies are now managed by Yarn. This means that it's necessary to install and verify the dependencies listed in the project's package.json file.
+Run the following command to install these dependencies:
+The --check-files flag checks to make sure that any files already installed in the node_modules directory have not been removed.
+Next, run your database migrations:
+Once your migrations have finished, you can test the application to ensure that it is working as expected. Start your server with the following command if you are working locally:
+If you are working on a development server, you can start the application with:
+Navigate to localhost:3000 or http://your_server_ip:3000 . You will see the following landing page:
+   yarn install --check-files
+    rails db:migrate
+  rails s
+  rails s --binding=your_server_ip
+  
+  To create a new shark, click on the New Shark link at the bottom of the page, which will take you to the sharks/new route. You will be prompted for a username (sammy) and password (shark), thanks to the project's authentication settings. The new view looks like this:
+    Application Landing Page
+   
+    To verify that the application is working, we can add some demo information to it. Input “Great White” into the Name field and “Scary” into the Facts field:
+ Create New Shark
  
-         review.style.visibility = "hidden";
-    }
+    Click on the Create Shark button to create the shark:
+ Add Great White Shark
+ 
+  You have now installed the necessary dependencies for your project and tested its functionality. Next, you can make a few changes to the Rails application so that users encounter a main landing page before navigating to the shark information application itself.
+Step 2 — Adding a Main Landing Page and Controller
+The current application sets the root view to the main shark information page, the index view for the sharks controller. While this works to get users to the main application, it may be less desirable if we decide to develop the application in the future and add other capabilities and features. We can reorganize the application to have the root view set to a home controller, which will include an index view. From there, we can link out to other parts of the application.
+     Show Shark
+   
+ To create the home controller, you can use the rails generate command with the controller generator. In this case, we will specify that we want an
+index view for our main landing page:
+With the controller created, you'll need to modify the root view in the project's config/routes.rb file — the file that specifies the application's route declarations — since the root view is currently set to the sharks index view.
+Open the file:
+Find the following line:
+      rails generate controller home index
+    nano config/routes.rb
+ ~/rails-bootstrap/config/routes.rb
+  .. .
+root 'sharks#index' .. .
+Change it to the following:
+ 
+ This will set the home controller's index view as the root of the application, making it possible to branch off to other parts of the application from there.
+Save and close the file when you are finished editing.
+With these changes in place, you are ready to move on to adding Bootstrap to the application.
+Step 3 — Installing Bootstrap and Adding Custom Styles
+In this step, you will add Bootstrap to your project, along with the tool libraries that it requires to function properly. This will involve importing libraries and plugins into the application's webpack entry point and environment files. It will also involve creating a custom style sheet in your application's app/javascript directory, the directory where the project's JavaScript assets live.
+First, use yarn to install Bootstrap and its required dependencies:
+Many of Bootstrap's components require JQuery and Popper.js, along with Bootstrap's own custom plugins, so this command will ensure that you have
+      yarn add bootstrap jquery popper.js
+  ~/rails-bootstrap/config/routes.rb
+ .. .
+root 'home#index' .. .
+  
+   config/webpack/environ
+     ment.js
+ nano
+  nano config/webpack/environment.js
+ ~/rails-bootstrap/config/webpack/environment.js
+  const { environment } = require('@rails/webpacker')
+const webpack = require("webpack")
+environment.plugins.append("Provide", new webpack.ProvidePlugi
+n({
+  $: 'jquery',
+  jQuery: 'jquery',
+  Popper: ['popper.js', 'default']
+}))
+module.exports = environment
+   ProvidePlugin import require
+ the libraries you need.
+Next, open your main webpack configuration file,
+with or your favorite editor:
+Inside the file, add the webpack library, along with a ProvidePlugin that tells Bootstrap how to interpret JQuery and Popper variables.
+Add the following code to the file:
+ The helps us avoid the multiple or statements we would normally use when working with JQuery or Popper
+
+ app/javascript/packs/app
+    lication.js
+    nano app/javascript/packs/application.js
+ scss
+import
+  stylesheets
+  mkdir app/javascript/stylesheets
+ modules. With this plugin in place, webpack will automatically load the correct modules and point the named variables to each module's loaded exports.
+Save and close the file when you are finished editing. Next, open your main webpack entry point file,
+:
+Inside the file, add the following statements to import Bootstrap and the custom styles file that you will create next:
+.. .
+[label ~/rails-bootstrap/app/javascript/packs/application.js] import { Application } from "stimulus"
+import { definitionsFromContext } from "stimulus/webpack-helpers"
+import "bootstrap"
+import "../stylesheets/application"
+.. .
+Save and close the file when you are finished editing.
+Next, create a directory for your application style sheet:
+
+  Open the custom styles file:
+This is an scss file, which uses Sass instead of CSS. Sass, or Syntactically Awesome Style Sheets, is a CSS extension language that lets developers integrate programming logic and conventions like shared variables into styling rules.
+In the file, add the following statements to import the custom Bootstrap scs s styles and Google fonts for the project:
+  nano app/javascript/stylesheets/application.scss
+   ~/rails-
+bootstrap/app/javascript/stylesheets/application
+.scss
+  @import "~bootstrap/scss/bootstrap";
+@import url('https://fonts.googleapis.com/css?family=Merriweat
+her:400,700');
+Next, add the following custom variable definitions and styles for the application:
+ 
+~/rails-
+bootstrap/app/javascript/stylesheets/application
+.scss
+   .. .
+$white: white; $black: black;
+.navbar {
+        margin-bottom: 0;
+        background: $black;
 }
- link_to
-index
- index index
-   nano app/views/books/index.html.erb
-  button_to
-javascript_pack_tag
-    vascript_include_tag
-    app/views/layouts/app
-   lication.html.erb
-    Save and close the file when you are finished editing.
-With your Stimulus controller in place, you can move on to making some final changes to the view and testing your application.
+body {
+} h1, h2 {
+} p{
+background: $black;
+color: $white;
+font-family: 'Merriweather', sans-serif;
+font-weight: bold;
+font-size: 16px;
+color: $white;
+}
+a:visited {
+        color: $black;
+ 
+ }
+.jumbotron {
+background: #0048CD; color: $white; text-align: center; p{
+                color: $white;
+                font-size: 26px;
+} }
+.link {
+        color: $white;
+}
+.btn-primary {
+        color: $white;
+        border-color: $white;
+        margin-bottom: 5px;
+}
+.btn-sm {
+        background-color: $white;
+        display: inline-block;
+}
+img,
+video,
+audio {
+margin-top: 20px;
+max-width: 80%;
+ 
+Save and close the file when you are finished editing.
+You have added Bootstrap to your project, along with some custom styles. Now you can move on to integrating Bootstrap layout conventions and components into your application files.
