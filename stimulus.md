@@ -128,7 +128,7 @@ class ReviewsController < ApplicationController
   end 
 end
 ```
-As you can see we have slimmed down the file and removed much of the logic to handle the responses and redirects with stimulus.
+As you can see we have slimmed down the file and removed much of the logic to handle the responses and redirects with Stimulus.
 
 The `books/show` view that will act as the base for reviews and all partials associated with reviews. So in this view, the first thing we will address is how we will accept user input for new reviews, and how we will present reviews back to the user.
 
