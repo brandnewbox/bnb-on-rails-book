@@ -1,115 +1,73 @@
-How To Add Bootstrap to a Ruby on Rails Application
-Written by Kathleen Juell
-If you are developing a Ruby on Rails application, you may be interested in adding styles to your project to facilitate user engagement. One way to do this is by adding Bootstrap, an HTML, CSS, and JavaScript framework designed to simplify the process of making web projects responsive and mobile ready. By implementing Bootstrap in a Rails project, you can integrate its layout conventions and components into your application to make user interactions with your site more engaging.
-In this tutorial, you will add Bootstrap to an existing Rails project that uses the webpack bundler to serve its JavaScript and CSS assets. The goal will be to create a visually appealing site that users can interact with to share information about books:
-     
-  Prerequisites
-To follow this tutorial, you will need: - A local machine or development server running Ubuntu 18.04. Your development machine should have a non-root user with administrative privileges and a firewall configured with
-ufw . For instructions on how to set this up, see our Initial Server Setup with Ubuntu 18.04 tutorial. - Node.js and npm installed on your local machine or
-development server. This tutorial uses Node.js version <>10.16.3<> and npm version <>6.9.0<>. For guidance on installing Node.js and npm on Ubuntu 18.04, follow the instructions in the “Installing Using a PPA” section of How To Install Node.js on Ubuntu 18.04. - Ruby, rbenv, and Rails installed on your local machine or development server, following Steps 1-4 in How To Install Ruby on Rails with rbenv on Ubuntu 18.04. This tutorial uses Ruby <>2.5.1<>, rbenv <>1.1.2<>, and Rails <>5.2.3<>. - SQLite installed, following
-       Application Landing Page
-   
- Step 1 of How To Build a Ruby on Rails Application. This tutorial uses SQLite 3 <>3.22.0<>.
-Step 1 — Cloning the Project and Installing Dependencies
-Our first step will be to clone the rails-stimulus repository from the DigitalOcean Community GitHub account. This repository includes the code from the setup described in How To Add Stimulus to a Ruby on Rails Application, which described how to add Stimulus.js to an existing Rails 5 project.
-Clone the repository into a directory called rails-bootstrap :
-Navigate to the rails-bootstrap directory:
-In order to work with the project code, you will first need to install the project's dependencies, which are listed in its Gemfile. Use the following command to install the required gems:
-        git clone https://github.com/do-community/rails-stimulus.git r ails-bootstrap
-    cd rails-bootstrap
-  bundle install
+# How To Add Bootstrap to a Ruby on Rails Application
 
-  Next, you will install your Yarn dependencies. Because this Rails 5 project has been modified to serve assets with webpack, its JavaScript dependencies are now managed by Yarn. This means that it's necessary to install and verify the dependencies listed in the project's package.json file.
-Run the following command to install these dependencies:
-The --check-files flag checks to make sure that any files already installed in the node_modules directory have not been removed.
-Next, run your database migrations:
-Once your migrations have finished, you can test the application to ensure that it is working as expected. Start your server with the following command if you are working locally:
-If you are working on a development server, you can start the application with:
-Navigate to localhost:3000 or http://your_server_ip:3000 . You will see the following landing page:
-   yarn install --check-files
-    rails db:migrate
-  rails s
-  rails s --binding=your_server_ip
-  
-  To create a new book, click on the New Shark link at the bottom of the page, which will take you to the books/new route. You will be prompted for a username (sammy) and password (book), thanks to the project's authentication settings. The new view looks like this:
-    Application Landing Page
-   
-    To verify that the application is working, we can add some demo information to it. Input “Great White” into the Name field and “Scary” into the Facts field:
- Create New Shark
- 
-    Click on the Create Shark button to create the book:
- Add Great White Shark
- 
-  You have now installed the necessary dependencies for your project and tested its functionality. Next, you can make a few changes to the Rails application so that users encounter a main landing page before navigating to the book information application itself.
-Step 2 — Adding a Main Landing Page and Controller
-The current application sets the root view to the main book information page, the index view for the books controller. While this works to get users to the main application, it may be less desirable if we decide to develop the application in the future and add other capabilities and features. We can reorganize the application to have the root view set to a home controller, which will include an index view. From there, we can link out to other parts of the application.
-     Show Shark
-   
- To create the home controller, you can use the rails generate command with the controller generator. In this case, we will specify that we want an
-index view for our main landing page:
-With the controller created, you'll need to modify the root view in the project's config/routes.rb file — the file that specifies the application's route declarations — since the root view is currently set to the books index view.
-Open the file:
-Find the following line:
-      rails generate controller home index
-    nano config/routes.rb
- ~/rails-bootstrap/config/routes.rb
-  .. .
-root 'books#index' .. .
-Change it to the following:
- 
- This will set the home controller's index view as the root of the application, making it possible to branch off to other parts of the application from there.
-Save and close the file when you are finished editing.
-With these changes in place, you are ready to move on to adding Bootstrap to the application.
-Step 3 — Installing Bootstrap and Adding Custom Styles
-In this step, you will add Bootstrap to your project, along with the tool libraries that it requires to function properly. This will involve importing libraries and plugins into the application's webpack entry point and environment files. It will also involve creating a custom style sheet in your application's app/javascript directory, the directory where the project's JavaScript assets live.
-First, use yarn to install Bootstrap and its required dependencies:
-Many of Bootstrap's components require JQuery and Popper.js, along with Bootstrap's own custom plugins, so this command will ensure that you have
-      yarn add bootstrap jquery popper.js
-  ~/rails-bootstrap/config/routes.rb
- .. .
-root 'home#index' .. .
-  
-   config/webpack/environ
-     ment.js
- nano
-  nano config/webpack/environment.js
- ~/rails-bootstrap/config/webpack/environment.js
-  const { environment } = require('@rails/webpacker')
+When developing a application, you may be interested in adding styles to your project to facilitate user engagement. One way to do this is by adding [Bootstrap](https://getbootstrap.com/), an HTML, CSS, and JavaScript framework designed to simplify the process of making web projects responsive and mobile ready. By implementing Bootstrap in a Rails project, you can integrate its layout conventions and components into your application to make user interactions with your site more engaging.
+
+In this section, you will add Bootstrap to `bnb-library` that uses the [webpack](https://webpack.js.org/) bundler to serve its JavaScript and CSS assets. The goal will be to create a visually appealing site that users can interact with to share information about books:
+
+## Step 1 — Installing Bootstrap and Adding Custom Styles
+
+In this step, you will add Bootstrap to your project, along with the tool libraries that it requires to function properly. This will involve importing libraries and plugins into the application's webpack entry point and environment files. It will also involve creating a custom style sheet in your application's `app/javascript` directory, the directory where the project's JavaScript assets live.
+
+First, use `yarn` to install Bootstrap and its required dependencies:
+```
+dip yarn add bootstrap jquery popper.js
+```
+Many of Bootstrap's components require [JQuery](https://jquery.com/) and [Popper.js](https://popper.js.org/), along with Bootstrap's own custom plugins, so this command will ensure that you have the libraries you need.
+
+Next, open your main webpack configuration file, `config/webpack/environment.js` with VSCode:
+```rb
+# config/webpack/environment.js
+```
+Inside the file, add the webpack library, along with a [ProvidePlugin](https://webpack.js.org/plugins/provide-plugin/) that tells Bootstrap how to interpret JQuery and Popper variables.
+
+Add the following code to the file:
+```js
+# config/webpack/environment.js
+-------------------------------
+
+const { environment } = require('@rails/webpacker')
 const webpack = require("webpack")
-environment.plugins.append("Provide", new webpack.ProvidePlugi
-n({
+
+environment.plugins.append("Provide", new webpack.ProvidePlugin({
   $: 'jquery',
   jQuery: 'jquery',
   Popper: ['popper.js', 'default']
 }))
-module.exports = environment
-   ProvidePlugin import require
- the libraries you need.
-Next, open your main webpack configuration file,
-with or your favorite editor:
-Inside the file, add the webpack library, along with a ProvidePlugin that tells Bootstrap how to interpret JQuery and Popper variables.
-Add the following code to the file:
- The helps us avoid the multiple or statements we would normally use when working with JQuery or Popper
 
- app/javascript/packs/app
-    lication.js
-    nano app/javascript/packs/application.js
- scss
-import
-  stylesheets
-  mkdir app/javascript/stylesheets
- modules. With this plugin in place, webpack will automatically load the correct modules and point the named variables to each module's loaded exports.
-Save and close the file when you are finished editing. Next, open your main webpack entry point file,
-:
-Inside the file, add the following statements to import Bootstrap and the custom styles file that you will create next:
-.. .
-[label ~/rails-bootstrap/app/javascript/packs/application.js] import { Application } from "stimulus"
-import { definitionsFromContext } from "stimulus/webpack-helpers"
+module.exports = environment
+```
+The `ProvidePlugin` helps us avoid the multiple `import` or `require` statements we would normally use when working with JQuery or Popper modules. With this plugin in place, webpack will automatically load the correct modules and point the named variables to each module's loaded exports.
+
+Save and close the file when you are finished editing.
+
+Next, open your main webpack entry point file, `app/javascript/packs/application.js`:
+```rb
+# app/javascript/packs/application.js
+```
+Inside the file, add the following `import` statements to import Bootstrap and the custom `scss` styles file that you will create next:
+```js
+# app/javascript/packs/application.js
+-------------------------------------
+
+import Rails from "@rails/ujs"
+import Turbolinks from "turbolinks"
+import * as ActiveStorage from "@rails/activestorage"
+import "channels"
+
+Rails.start()
+Turbolinks.start()
+ActiveStorage.start()
+
+import "controllers"
 import "bootstrap"
 import "../stylesheets/application"
-.. .
+```
 Save and close the file when you are finished editing.
-Next, create a directory for your application style sheet:
+
+Next, create a `stylesheets` directory in VSCode for your application style sheet:
+```rb
+# app/javascript/stylesheets
+```
 
   Open the custom styles file:
 This is an scss file, which uses Sass instead of CSS. Sass, or Syntactically Awesome Style Sheets, is a CSS extension language that lets developers integrate programming logic and conventions like shared variables into styling rules.
