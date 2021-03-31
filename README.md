@@ -34,6 +34,6 @@ At Brand New Box, we find ourselves using a lot of the same technology concepts 
 * [Stimulus.js](./stimulus.html)
 * [Adding Bootstrap](./bootstrap.html)
 * [Trestle It](./trestle.html)
+* [Secure It](./devise.html)
 * [Simple Form](./simple-form.html)
-* [HotWire](#)
 * [Securing the Application](./devise.html)
