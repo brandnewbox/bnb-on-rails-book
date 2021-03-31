@@ -29,14 +29,11 @@ This is the `hello-world` stuff. You can probably find this everywhere else on t
 
 At Brand New Box, we find ourselves using a lot of the same technology concepts over and over. Here they are.
 
-* [Nested Resources](./nested-resources.md)
-* [Switching from ERB to HAML](./haml.md)
-* [Layouts](./layouts.html)
-* [Adding Bootstrap](./bootstrap.html)
-* [Simple Form](./simple-form.html)
-* [Model Validations](./validations.html)
+* [Nested Resources](./nested-resources.html)
+* [Switching from ERB to HAML](./haml.html)
 * [Stimulus.js](./stimulus.html)
-* [State Machines](#)
+* [Adding Bootstrap](./bootstrap.html)
+* [Trestle It](./trestle.html)
+* [Simple Form](./simple-form.html)
 * [HotWire](#)
 * [Securing the Application](./devise.html)
-* [Sidekiq](./sidekiq.html)
