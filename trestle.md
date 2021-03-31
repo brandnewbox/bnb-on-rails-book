@@ -5,11 +5,7 @@ In many of our applications at Brand New Box we include a Admin portal or framew
 Remember how cool it was the first time you generated scaffolding using the [rails generate](https://guides.rubyonrails.org/command_line.html#rails-generate) command? [Trestle](https://github.com/TrestleAdmin/trestle) emulates this, but creates even more features. 
 
 ## Step 1 - Add the gem
-Start by opening your Gemfile: 
-```rb
-# bnb-library/Gemfile
-```
-To start using Trestle, first add it to your Gemfile below `'font-awesome-rails'`: 
+To start using Trestle, first add it to your Gemfile: 
 ```rb
 # bnb-library/Gemfile
 ---------------------
