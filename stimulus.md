@@ -764,7 +764,7 @@ In the review form, type “This book was great!”:
 Click on *Create Review*. You will now see the new review on the page:
 ![new review](images/new-review2.png)
 You can add another new review, if you would like. This time, type “This book was misrepresented in films.” and click *Create Review*:
-![new review](images/book-review3.png)
+![new review](images/new-review3.png)
 Test the functionality of the *Show Older Reviews* feature. Clicking on *Show Older Reviews* will now show you the reviews you created:
 ![old reviews](images/book-old-reviews.png)
 You can now upvote a review by clicking on the *Upvote Review* button:
