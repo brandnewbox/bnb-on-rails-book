@@ -36,3 +36,4 @@ At Brand New Box, we find ourselves using a lot of the same technology concepts 
 * [Trestle It](./trestle.html)
 * [Securing the Application](./devise.html)
 * [Seed the Application](./seeds.html)
+* [Add Pagination](./paginate.html)
