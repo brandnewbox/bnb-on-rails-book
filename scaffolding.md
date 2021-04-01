@@ -62,7 +62,7 @@ create_table :books do |t|
   t.timestamps
 end
 ```
-`null: false` specifies that a `book`record *must* have a title in order to be valid. To create the `Book` table run
+`null: false` specifies that a `book`record *must* have a title in order to be stored in the database. Consider it an extra layer of validation. To create the `Book` table run
 ```
 dip rails db:migrate
 ```
