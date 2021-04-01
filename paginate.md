@@ -1,6 +1,6 @@
 # Adding Pagination
 
-Using the pagination library, [will_paginate](https://github.com/mislav/will_paginate), we will add pagination to our `books` `index` view so we don't create an infinite scrolling scenario.
+Using the pagination library, [will_paginate](https://github.com/mislav/will_paginate), we will add pagination to our `books` `index` view so we don't create an infinite scrolling scenario. This is only one of many options: [Trestle](https://github.com/TrestleAdmin/trestle) includes the gem [Kaminari](https://github.com/kaminari/kaminari) by default, and we also have worked with [Pagy](https://github.com/ddnexus/pagy).
 
 ## Step 1 - Installing will_paginate
 
@@ -16,6 +16,11 @@ gem 'will_paginate'
 Bundle your Gemfile: 
 ```
 dip bundle install
+```
+Because you have added a new Gem, you will need to restart your server if it is currently running:
+```
+dip down
+dip up
 ```
 
 ## Step 2 - Pagination and Model / View Integration
@@ -155,11 +160,6 @@ Now open the file `app/javascript/stylesheets/application.scss` and add these cu
 *:first-child + html .pagination {
   overflow: hidden; 
 }
-```
-You will need to restart your server if it is currently running:
-```
-dip down
-dip up
 ```
 Navigate to `localhost:3000/books` to see our inclusion of [will_paginate](https://github.com/mislav/will_paginate) at work: 
 ![book index](images/paginate/book-index.png)
