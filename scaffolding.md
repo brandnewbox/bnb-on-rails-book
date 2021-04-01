@@ -55,14 +55,14 @@ Rails has created the model at `app/models/book.rb` and a database migration to 
 -------------------------------------------
 
 create_table :books do |t|
-  t.string :title, limit: 32, null: false
+  t.string :title, null: false
   t.text :description
   t.float :price
 
   t.timestamps
 end
 ```
-`limit: 32` specifies that we want a max limit of 32 characters on our title, and `null: false` that a `book`record *must* have a title in order to be valid. To create the `Book` table run
+`null: false` specifies that a `book`record *must* have a title in order to be stored in the database. Consider it an extra layer of validation. To create the `Book` table run
 ```
 dip rails db:migrate
 ```
