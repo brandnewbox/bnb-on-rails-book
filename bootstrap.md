@@ -32,7 +32,7 @@ In this step, you will add Bootstrap to your project, along with the tool librar
 
 First, use `yarn` to install Bootstrap and its required dependencies:
 ```
-dip yarn add bootstrap jquery popper.js
+dip yarn add bootstrap jquery @popperjs/core
 ```
 Many of Bootstrap's components require [JQuery](https://jquery.com/) and [Popper.js](https://popper.js.org/), along with Bootstrap's own custom plugins, so this command will ensure that you have the libraries you need.
 
@@ -47,16 +47,19 @@ Add the following code to the file:
 # config/webpack/environment.js
 -------------------------------
 
-const { environment } = require('@rails/webpacker')
+const { environment } = require("@rails/webpacker")
 const webpack = require("webpack")
 
-environment.plugins.append("Provide", new webpack.ProvidePlugin({
-  $: 'jquery',
-  jQuery: 'jquery',
-  Popper: ['popper.js', 'default']
-}))
+environment.plugins.prepend("Provide",
+  new webpack.ProvidePlugin({
+    $: "jquery/src/jquery",
+    jQuery: "jquery/src/jquery",
+    Popper: "@popperjs/core"
+  })
+)
 
 module.exports = environment
+
 ```
 The `ProvidePlugin` helps us avoid the multiple `import` or `require` statements we would normally use when working with JQuery or Popper modules. With this plugin in place, webpack will automatically load the correct modules and point the named variables to each module's loaded exports.
 
