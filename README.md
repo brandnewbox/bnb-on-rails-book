@@ -21,6 +21,7 @@ Consistent development environments are critical at Brand New Box. Here is how w
 
 This is the `hello-world` stuff. You can probably find this everywhere else on the internet, but this is the version we maintain.
 
+* [What is Rails?](./rails-intro.html)
 * [Creating a New Rails Project](./rails-new.html)
 * [Scaffolding](./scaffolding.html)
 * [Basic Functionality](./functionality.html)
