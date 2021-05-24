@@ -1,8 +1,17 @@
 # How do websites work?
 
-At the most basic level Rails is a tool for listening to HTTP requests from user's web browers and return HTTP responses. When you visit any website on the internet your browser constructs an HTTP request and sends it to the server that is running that website. Every website on the internet has a piece of software running that listens for those HTTP requests and prepares an HTTP response to send back to your browser.
+At the most basic level Rails is a tool for listening to HTTP requests from user's web browers and return HTTP responses. When you visit any website on the internet your browser constructs an HTTP request and sends it to the server that is running that website. Every website on the internet has a piece of software running that listens for those HTTP requests and prepares an HTTP response to send back to your browser. You can think of it like your browser is asking the server a question and the server is giving you back an answer.
 
 As an example when you visit https://brandnewbox.com your browser sends a request to the server that runs brandnewbox.com that says that you would like to see the content at "/" (the root path of every website). Our server takes that request, figures out which page to show you and then sends you an HTTP 200 response with the HTML content of the page which your browser then renders and displays. Every properly configured website server will return an HTTP response for _every_ HTTP request. As another example if you try to visit https://brandnewbox.com/this-page-does-not-exist from your browser your browser sends a HTTP request to brandnewbox.com requesting the content at "/this-page-does-not-exist". The brandnewbox.com server returns an HTTP 404 response which indicates that the server doesn't have any content to show you at the path that you requested.
+
+There are many different [HTTP Request Methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) which are ways that your browser can tip the server off about what kind of question you are asking.
+
+* The `GET` method retrieves data. The browser says "can you give me the data I'm asking for?".
+* The `POST` method submits data, often causing a change in state or side effects on the server. This is often used in Rails to submit _new_ data, which is used to create information on the server. The browser says "can you create a new resource with the data I am sending you?"
+* The `PUT` and `PATCH` methods submit data, causing a change in state or side effects on the server. This is often used in Rails to update _existing_ data. The browser says "can you update an existing resource with this new data?".
+* The `DELETE` method deletes data. The browser says "can you get rid of this data?".
+
+HTTP request methods can be a little bit confusing because the server doesn't have to strictly listen to them. If you send a GET request the server is still allowed to update data in a database if it wants. But best practice when building websites is to try to build requests and responses that align with the semantics of the request methods.
 
 There are many different [HTTP Response Codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) which are grouped into categories.
 
