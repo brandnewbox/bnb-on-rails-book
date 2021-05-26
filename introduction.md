@@ -8,4 +8,4 @@ Often, resources on development and deployment are relatively independent of one
 
 ## Learning Goals and Outcomes
 
-The goal for this guide is to serve readers interested in Rails application development, as well as readers who would like to learn more about working with containers and container orchestrators. It assumes a shared interest in moving away from highly individuated local environments, infavor of repeatable, reproducible application environments that ensure consistency and ultimately resiliency over time.
+The goal for this guide is to serve readers interested in Rails application development, as well as readers who would like to learn more about working with containers and container orchestrators. It assumes a shared interest in moving away from highly individuated local environments, in favor of repeatable, reproducible application environments that ensure consistency and ultimately resiliency over time.
