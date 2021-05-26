@@ -4,7 +4,7 @@ This book is designed as an introduction to building and containerizing a Ruby o
 
 ## Motivation for this Book
 
-Often, resources on development and deployment are relatively independent of one another: guides on containers and Kubernetes rarely cover application development, and tutorials on languages and  frameworks are often focused on languages and other nuances rather than on deployment. This book is designed to be a full-stack introduction to  containers and Kubernetes by way of Rails application development. It  assumes that readers want an introduction not only to the fundamentals ofcontainerization, but also to the basics of working with Rails and a database backend.
+Often, resources on development and deployment are relatively independent of one another: guides on containers and Kubernetes rarely cover application development, and tutorials on languages and  frameworks are often focused on languages and other nuances rather than on deployment. This book is designed to be a full-stack introduction to  containers and Kubernetes by way of Rails application development. It  assumes that readers want an introduction not only to the fundamentals of containerization, but also to the basics of working with Rails and a database backend.
 
 ## Learning Goals and Outcomes
 
