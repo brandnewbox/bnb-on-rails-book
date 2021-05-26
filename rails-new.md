@@ -1,6 +1,6 @@
 # Step 1 — Creating an Empty Container
 
-We are going to house our Rails Application within a container, so in order to do this, we must first create it! On your local machine, make an empty directory.
+We are going to house our Rails Application within a container, so in order to do this, we must first create it! On your machine, make an empty directory.
 
 ```
 mkdir bnb-library
@@ -15,9 +15,9 @@ Instead of having to manage the versions of multiple different dependancies for 
 
 In your new directory make a `docker-compose.yml` file and paste in:
 
-```ruby
-# docker-compose.yml
+docker-compose.yml
 --------------------
+```ruby
 
 version: "3"
 services:
