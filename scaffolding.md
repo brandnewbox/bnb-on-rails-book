@@ -9,7 +9,7 @@ Type the following command to generate a `Book` model, controller, and associate
 ```ruby
 dip rails generate scaffold Book title:string description:text price:float
 ```
-With `name:string`, `price:float`, and `description:text` we are giving Rails information about the fields we would like in our database table and the type of data they should accept.
+With `title:string`, `price:float`, and `description:text` we are giving Rails information about the fields we would like in our database table and the type of data they should accept.
 
 When you type this command, you will again see a long list of output that explains everything Rails is generating for you. The output below highlights some of the more significant things for our setup:
 
