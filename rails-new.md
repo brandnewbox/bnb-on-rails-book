@@ -15,8 +15,8 @@ Instead of having to manage the versions of multiple different dependancies for 
 
 In your new directory make a `docker-compose.yml` file and paste in:
 
-docker-compose.yml
---------------------
+<figure><strong><code>docker-compose.yml</code></strong></figure>
+
 ```ruby
 
 version: "3"
@@ -76,10 +76,10 @@ You will see a good deal of output telling you what Rails is creating for your n
 - *gemfile* : This file lists the gem dependencies for your application. A gem is a Ruby software package, and a Gemfile allows you to manage your project's software needs. 
 - *app*: The app directory is where your main application code lives. This includes the models, controllers, views, assets, helpers, and mailers that make up the application itself. Rails gives you some application-level boilerplate for the MCV model to start out in files like `app/models/application_record.rb`, `app/controllers/application_controller.rb`, and `app/views/layouts/application.html.erb`.
 - *config*: This directory contains your application's configuration settings.
-- *config/routes*: Your application's route declarations live in this file.
+- *config/routes.rb*: Your application's route declarations live in this file.
 - *config/application.rb*: General settings for your application components are located in this file. 
 - *config/environments*: This directory is where configuration settings for your environments live. Rails includes three environments by default: `development`, `test`, and `production`. 
-- *config/database*: Database configuration settings live in this file, which is broken into four sections: `default`, `development`, `production`, and `test`. Thanks to the Gemfile that came with the `rails new bnb-library --database=postgresql`, which included the `pg` gem, our `config/database.yml` file has its adapter parameter set to postgresql already, specifying that we will use an postgresql database with this application. 
+- *config/database.yml*: Database configuration settings live in this file, which is broken into four sections: `default`, `development`, `production`, and `test`. Thanks to the Gemfile that came with the `rails new bnb-library --database=postgresql`, which included the `pg` gem, our `config/database.yml` file has its adapter parameter set to postgresql already, specifying that we will use an postgresql database with this application. 
 - *db*: This folder includes a directory for database migrations called migrate, along with the `schema.rb` and `seeds.rb` files. `schema.db` contains information about your database, while `seeds.rb` is where you can place seed data for the database.
 
 ## Step 3 - Starting Your Application
@@ -91,20 +91,20 @@ We are going to add a *url* to our `database.yml` file which is going to tell ou
 postgres://DATABASE_USERNAME:DATABASE_PASSWORD@DATABASE_HOST:PORT/DATABASE_NAME
 ```
 Under `development` we will add the appropriate configuration to point Rails at the Postgres service we have setup in our `docker-compose.yml` file.
-```yml
-# config/database.yml
----------------------
 
+<figure><strong><code>config/database.yml</code></strong></figure>
+
+```yml
 development:
   <<: *default
   database: bnb_library_development
   url: postgres://postgres:39dkdk3f93kkd93k20dl201kd83@postgres:5432
 ```
 The `test` environment will use the same database information on your local machine. But we use `ENV.fetch` to allow for the value to be overridden with an environment variable. This comes in handy when running tests elsewhere, i.e. CircleCI or a similar CI/CD service.
-```yml
-# config/database.yml
----------------------
 
+<figure><strong><code>config/database.yml</code></strong></figure>
+
+```yml
 test:
   <<: *default
   database: bnb_library_test
