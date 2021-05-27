@@ -7,7 +7,7 @@ In this section, you will build on our existing `bnb-library` Rails application.
 
 ## Step 1 — Scaffolding the Nested Model
 
-Our application will take advantage of Active Record associations to build out a relationship between `Book` and `Reviews` models: reviews will belong to particular books, and each book can have multiple reviews. Our and `Book` and `Review` models will therefore be related through [belongs_to](https://guides.rubyonrails.org/association_basics.html#the-belongs-to-association) and [has_many](https://guides.rubyonrails.org/association_basics.html#the-has-many-association) associations.
+Our application will take advantage of Active Record associations to build out a relationship between `Book` and `Reviews` models: reviews will belong to particular books, and each book can have multiple reviews. Our `Book` and `Review` models will therefore be related through [belongs_to](https://guides.rubyonrails.org/association_basics.html#the-belongs-to-association) and [has_many](https://guides.rubyonrails.org/association_basics.html#the-has-many-association) associations.
 
 The first step to building out the application in this way will be to create a `Reivew` model and related resources. To do this, we can use the `rails generate scaffold` command, which will give us a model, a [database migration](https://guides.rubyonrails.org/active_record_migrations.html) to alter the database schema, a controller, a full set of views to manage standard [Create, Read, Update, and Delete](https://en.wikipedia.org/wiki/) (CRUD) operations, and templates for partials, helpers, and tests. We will need to modify these resources, but using the `scaffold` command will save us some time and energy since it generates a structure we can use as a starting point.
 
@@ -22,10 +22,10 @@ With body:text, we're telling Rails to include a `body` field in the `reviews` d
 Once you have run the command, you will see output confirming the resources that Rails has generated for the application. Before moving on, you can check your database migration file to look at the relationship that now exists between your models and database tables.
           
 You will see the following (the timestamp in the filename will be different):
-```ruby
-# db/migrate/20210324201444_create_reviews.rb
----------------------------------------------
 
+<figure><strong><code>db/migrate/20210324201444_create_reviews.rb</code></strong></figure>
+
+```ruby
 class CreateReviews < ActiveRecord::Migration[6.1]
   def change
     create_table :reviews do |t|
@@ -40,10 +40,10 @@ end
 As you can see, the table includes a column for a book foreign key. This key will take the form of `model_name_id` — in our case, `book_id`.
 
 Rails has established the relationship between the models elsewhere as well. Take a look at the newly generated `Review` model:
-```ruby
-# app/models/Review.rb
-----------------------
 
+<figure><strong><code>app/models/review.rb</code></strong></figure>
+
+```ruby
 class Review < ApplicationRecord
   belongs_to :book
 end
@@ -59,10 +59,10 @@ This is a useful start, but we will need to configure some additional routing an
 Rails has already set the `belongs_to` association in our `Review` model, thanks to the `:references` keyword in the `rails generate scaffold` command, but in order for that relationship to function properly we will need to specify a `has_many` association in our `Book` model as well. We will also need to make changes to the default routing that Rails gave us in order to make reviews resources the children of book resources.
 
 To add the `has_many` association to the `Book` model, open `app/models/book.rb` using VSCode, and add the following line to the file to establish the relationship between books and reviews:
-```ruby
-# app/models/book.rb
---------------------
 
+<figure><strong><code>app/models/book.rb</code></strong></figure>
+
+```ruby
 class Book < ApplicationRecord
   has_many :reviews
   validates :title, presence: true, uniqueness: true
@@ -70,14 +70,14 @@ class Book < ApplicationRecord
   validates :price, presence: true
 end
 ```
-One thing that is worth thinking about here is what happens to reivews once a particular book is deleted. We likely do not want the reviews associated with a deleted book persisting in the database. To ensure that any reviews associated with a given book are eliminated when that book is deleted, we can include the option with the association.
+One thing that is worth thinking about here is what happens to reviews once a particular book is deleted. We likely do not want the reviews associated with a deleted book persisting in the database. To ensure that any reviews associated with a given book are eliminated when that book is deleted, we can include the option with the association.
 
 Add the following code to the file to ensure that the action on a given book deletes any associated reviews:
 
-```ruby
-# app/models/book.rb
---------------------
 
+<figure><strong><code>app/models/book.rb</code></strong></figure>
+
+```ruby
 class Book < ApplicationRecord
   has_many :reviews, dependent: :destroy
   validates :title, presence: true, uniqueness: true
@@ -90,10 +90,10 @@ Once you have finished making these changes, save and close the file.
 Next, open your `config/routes.rb` file to modify the relationship between your resourceful routes:
 
 Currently, the file looks like this:
-```ruby
-# config/routes.rb
-------------------
 
+<figure><strong><code>config/routes.rb</code></strong></figure>
+
+```ruby
 Rails.application.routes.draw do
   resources :reviews
   resources :books
@@ -124,10 +124,10 @@ With these changes in place, you can move on to updating your reviews controller
 The association between our models gives us methods that we can use to create new review instances associated with particular books. To use these methods, we will need to add them our review controller.
  
 Open the review controller file, and currently, the file looks like this:
-```ruby
-# app/controllers/reviews_controller
-------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```ruby
 class ReviewsController < ApplicationController
   before_action :set_review, only: %i[ show edit update destroy ]
 
@@ -202,27 +202,26 @@ end
 Like our books controller, this controller's methods work with instances of the associated `Review` class. For example, the `new` method creates a new instance of the `Review` class, the `index` method grabs all instances of the class, and the `set_review` method uses `find` and `params` to select a particular review by `id`. If, however, we want our review instances to be associated with particular book instances, then we will need to modify this code, since the
 `Review` class is currently operating as an independent entity.
 
-Our modifications will make use of two things: - The methods that became available to us when we added the `belongs_to` and `has_many` associations to our models. Specifically, we now have access to the [build method](https://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_many) thanks to the `has_many` association we defined in our `Book` model. This method will allow us to create a collection of review objects associated with a particular book object, using the `book_id` foreign key that exists in our `books` database. - The routes and routing helpers that became available when we created a nested `reviews` route. For a full list of example routes that become available when you create nested relationships between resources, see the [Rails documentation](https://guides.rubyonrails.org/routing.html#nested-resources). For now, it will be enough for us to know that for each specific book — say `books/1` — there will be an associated route for reviews related to that book: `books/1/reviews`. There will also be routing helpers like `book_reviews_path(@book)` and `edit_book_reviews_path(@book)` that refer to these nested routes.
+Our modifications will make use of two things: first, the methods that became available to us when we added the `belongs_to` and `has_many` associations to our models. Specifically, we now have access to the [build method](https://api.rubyonrails.org/classes/ActiveRecord/Associations/ClassMethods.html#method-i-has_many) thanks to the `has_many` association we defined in our `Book` model. This method will allow us to create a collection of review objects associated with a particular book object, using the `book_id` foreign key that exists in our `books` database. And second, the routes and routing helpers that became available when we created a nested `reviews` route. For a full list of example routes that become available when you create nested relationships between resources, see the [Rails documentation](https://guides.rubyonrails.org/routing.html#nested-resources). For now, it will be enough for us to know that for each specific book — say `books/1` — there will be an associated route for reviews related to that book: `books/1/reviews`. There will also be routing helpers like `book_reviews_path(@book)` and `edit_book_reviews_path(@book)` that refer to these nested routes.
 
 In the file, we'll begin by writing a method, `get_book`, that will run before each action in the controller. This method will create a local `@book` instance variable by finding a book instance by `book_id`. With this variable available to us in the file, it will be possible to relate reviews to a specific book in the other methods.
 
 Above the other `private` methods at the bottom of the file, add the following method:
-```ruby
-# app/controllers/reviews_controller
-------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```ruby
 private
   def get_book
     @book = Book.find(params[:book_id])
   end
-  # Use callbacks to share common setup or constraints between
-actions.
+  # Use callbacks to share common setup or constraints between actions.
 ```
 Next, add the corresponding filter to the *top* of the file, before the existing filter:
-```ruby
-# app/controllers/reviews_controller
-------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```ruby
 class ReviewsController < ApplicationController
   before_action :get_book
 ```
@@ -232,10 +231,10 @@ This will ensure that `get_book` runs before each action defined in the file.
 Next, you can use this @book instance to rewrite the `index` method. Instead of grabbing all instances of the `Review` class, we want this method to return all review instances associated with a particular book instance.
 
 Modify the index method to look like this:
-```ruby
-# app/controllers/reviews_controller
-------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```ruby
 # GET /reviews or /reviews.json
 def index
   @reviews = @book.reviews 
@@ -244,10 +243,10 @@ end
 The `new` method will need a similar revision, since we want a new review instance to be associated with a particular book. To achieve this, we can make use of the `build` method, along with our local @book instance variable.
 
 Change the `new` method to look like this:
-```ruby
-# app/controllers/reviews_controller
-------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```ruby
 # GET /reviews/new
 def new
   @review = @book.reviews.build
@@ -258,10 +257,10 @@ This method creates a review object that's associated with the specific book ins
 Next, we'll address the method that's most closely tied to `new`: `create`. The `create` method does two things: it builds a new review instance using the parameters that users have entered into the `new` form, and, if there are no errors, it saves that instance and uses a route helper to redirect users to where they can see the new review. In the case of errors, it renders the `new` template again.
 
 Update the `create` method to look like this:
-```ruby
-# app/controllers/reviews_controller
-------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```ruby
 # POST /reviews or /reviews.json
 def create
   @review = @book.reviews.build(review_params)
@@ -282,10 +281,10 @@ Next, take a look at the `update` method. This method uses a `@review` instance 
 Take a look at the filters at the top of the file. The second, auto-generated `before_action` filter provides an answer:
  
 The `update` method (like `show`, `edit`, and `destroy`) takes a `@review` variable from the `set_review` method. That method, listed under the `get_book` method with our other private methods, currently looks like this:
-```ruby
-# app/controllers/reviews_controller.rb
----------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```ruby
 private
 
 # Use callbacks to share common setup or constraints between actions.
@@ -296,10 +295,10 @@ end
 In keeping with the methods we've used elsewhere in the file, we will need to modify this method so that `@review` refers to a particular instance in the *collection* of reviews that's associated with a particular book. Keep the `build` method in mind here — thanks to the associations between our models, and the methods (like `build`) that are available to us by virtue of those associations, each of our review instances is part of a collection of objects that's associated with a particular book. So it makes sense that when querying for a particular review, we would query the collection of reviews associated with a particular book.
 
 Update `set_review` to look like this:
-```ruby
-# app/controllers/reviews_controller.rb
----------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```ruby
 private
 
 # Use callbacks to share common setup or constraints between actions.
@@ -315,10 +314,10 @@ The `update` method makes use of the `@review` instance variable from
 `set_review`, and uses it with the `review_params` that the user has entered in the `edit` form. In the case of success, we want Rails to send the user back to the `index` view of the reviews associated with a particular book. In the case of errors, Rails will render the `edit` template again.
 
 In this case, the only change we will need to make is to the `redirect_to` statement, to handle successful updates. Update it to redirect to `book_review_path(@book)`, which will redirect to the `index` view of the selected book's reviews:
-```ruby
-# app/controllers/reviews_controller.rb
----------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```ruby
 # PATCH/PUT /reviews/1 or /reviews/1.json
 def update
   respond_to do |format|
@@ -334,10 +333,10 @@ end
 ```
 Next, we will make a similar change to the `destroy` method. Update the `redirect_to` method to redirect requests to `book_review_path(@book)` in the
 case of success:
-```ruby
-# app/controllers/reviews_controller.rb
----------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```ruby
 # DELETE /reviews/1 or /reviews/1.json
 def destroy
   @review.destroy
@@ -348,10 +347,10 @@ def destroy
 end
 ```
 This is the last change you will make. You now have a reviews controller that looks like this: 
-```ruby
-# app/controllers/reviews_controller.rb
----------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```ruby
 class ReviewsController < ApplicationController
   before_action :get_book
   before_action :set_review, only: %i[ show edit update destroy ]
@@ -437,19 +436,19 @@ Let's start with the foundational template for our reviews: the `form` partial t
 Rather than passing only the `review` model to the `form_with` form helper, we will pass both the `book` and `review` models, with `review` set as a child resource.
 
 Change the first line of the file to look like this, reflecting the relationship between our book and review resources:
-```erb
-# app/views/reviews/_form.html.erb
-----------------------------------
 
+<figure><strong><code>app/views/reviews/_form.html.erb</code></strong></figure>
+
+```erb
 <%= form_with(model: [@book, review]) do |form| %>
 ```
 Next, *delete* the section that lists the `book_id` of the related book, since this is not essential information in the view.
 
 The finished form, complete with our edits to the first line and without the deleted `book_id` section, will look like this:
-```erb
-# app/views/reviews/_form.html.erb
-----------------------------------
 
+<figure><strong><code>app/views/reviews/_form.html.erb</code></strong></figure>
+
+```erb
 <%= form_with(model: review) do |form| %>
   <% if review.errors.any? %>
     <div id="error_explanation">
@@ -483,12 +482,11 @@ Much like the other code we have already modified, however, this template treats
 
 In the body of the table, make the following updates:
 
-First, update `review.book` to `review.book.title`, so that the table will include the title field of the associated book, rather than identifying information about the book object itself:
+First, update `review.book_id` to `review.book.title`, so that the table will include the title field of the associated book, rather than identifying information about the book object itself:
+
+<figure><strong><code>app/views/reviews/index.html.erb</code></strong></figure>
 
 ```erb
-# app/views/reviews/index.html.erb
-----------------------------------
-
 <tbody>
   <% @reviews.each do |review| %>
     <tr>
@@ -499,57 +497,57 @@ Next, change the `Show` redirect to direct users to the `show` view for the asso
 
 Update the this line to the following:
 
+<figure><strong><code>app/views/reviews/index.html.erb</code></strong></figure>
+
 ```erb
-# app/views/reviews/index.html.erb
-----------------------------------
 <tbody>
   <% @reviews.each do |review| %>
     <tr>
       <td><%= review.body %></td>
-      <td><%= review.book_id %></td>
+      <td><%= review.book.title %></td>
       <td><%= link_to 'Show Book', [@book] %></td>
 ```
 In the next line, we want to ensure that users are routed the right nested path when they go to edit a review. This means that rather than being directed to `reviews/review_id/edit`, users will be directed to `book/book_id/reviews/review_id/edit`. To do this, we'll use the `book_review_path` routing helper and our models, which Rails will treat as URLs. We'll also update the link text to make its function clearer.
 
 Update the `Edit` line to look like the following:
-```erb
-# app/views/reviews/index.html.erb
-----------------------------------
 
+<figure><strong><code>app/views/reviews/index.html.erb</code></strong></figure>
+
+```erb
 <tbody>
   <% @reviews.each do |review| %>
     <tr>
       <td><%= review.body %></td>
-      <td><%= review.book_id %></td>
+      <td><%= review.book.title %></td>
       <td><%= link_to 'Show Book', [@book] %></td>
       <td><%= link_to 'Edit Review', edit_book_review_path(@book, review) %></td>
 ```
 Next, let's add a similar change to the `Destroy` link, updating its function in the string, and adding our `book` and `review` resources:
-```erb
-# app/views/reviews/index.html.erb
-----------------------------------
 
+<figure><strong><code>app/views/reviews/index.html.erb</code></strong></figure>
+
+```erb
 <tbody>
   <% @reviews.each do |review| %>
     <tr>
       <td><%= review.body %></td>
-      <td><%= review.book_id %></td>
+      <td><%= review.book.title %></td>
       <td><%= link_to 'Show Book', [@book] %></td>
       <td><%= link_to 'Edit Review', edit_book_review_path(@book, review) %></td>
       <td><%= link_to 'Destroy Review', [@book, review], method: :delete, data: { confirm: 'Are you sure?' } %></td>
 ```
 Finally, at the bottom of the form, we will want to update the path to take users to the appropriate nested path when they want to create a new review. Update the last line of the file to make use of the `new_book_review_path(@book)` routing helper:
-```erb
-# app/views/reviews/index.html.erb
-----------------------------------
 
+<figure><strong><code>app/views/reviews/index.html.erb</code></strong></figure>
+
+```erb
 <%= link_to 'New Review', new_book_review_path(@book) %>
 ```
 The finished file will look like this:
-```erb
-# app/views/reviews/index.html.erb
-----------------------------------
 
+<figure><strong><code>app/views/reviews/index.html.erb</code></strong></figure>
+
+```erb
 <p id="notice"><%= notice %></p>
 
 <h1>Reviews</h1>
@@ -567,7 +565,7 @@ The finished file will look like this:
     <% @reviews.each do |review| %>
       <tr>
         <td><%= review.body %></td>
-        <td><%= review.book_id %></td>
+        <td><%= review.book.title %></td>
         <td><%= link_to 'Show Book', [@book] %></td>
         <td><%= link_to 'Edit Review', edit_book_review_path(@book, review) %></td>
         <td><%= link_to 'Destroy Review', [@book, review], method: :delete, data: { confirm: 'Are you sure?' } %></td>
@@ -587,10 +585,10 @@ The other edits we will make to review views won't be as numerous, since our oth
 Open `app/views/reviews/new.html.erb`:
 
 Update the `link_to` reference at the bottom of the file to make use of the `book_reviews_path(@book)` helper:
-```erb
-# app/views/reviews/new.html.erb
-----------------------------------
 
+<figure><strong><code>app/views/reviews/new.html.erb</code></strong></figure>
+
+```erb
 <%= link_to 'Back', book_reviews_path(@book) %>
 ```
 Save and close the file when you are finished making this change.
@@ -598,10 +596,10 @@ Save and close the file when you are finished making this change.
 Next, open the `edit` template:
 
 In addition to the `Back` path, we'll update `Show` to reflect our nested resources. Change the last two lines of the file to look like this:
-```erb
-# app/views/reviews/edit.html.erb
-----------------------------------
 
+<figure><strong><code>app/views/reviews/edit.html.erb</code></strong></figure>
+
+```erb
 <%= link_to 'Show', [@book, @review] %> |
 <%= link_to 'Back', book_reviews_path(@book) %>
 ```
@@ -610,10 +608,10 @@ Save and close the file.
 Next, open the `show` template:
 
 Make the following edits to the `Edit` and `Back` paths at the bottom of the file:
-```erb
-# app/views/reviews/show.html.erb
-----------------------------------
 
+<figure><strong><code> app/views/reviews/show.html.erb</code></strong></figure>
+
+```erb
 <%= link_to 'Edit', edit_book_review_path(@book, @review) %> |
 <%= link_to 'Back', book_reviews_path(@book) %>
 ```
@@ -626,10 +624,10 @@ Our edits here will include adding a `Reviews` section to the form and an `Add R
 Below the `Price` for a given book, we will add a new section that iterates through each instance in the collection of reviews associated with this book, outputting the `body` of each review.
 
 Add the following code below the `Price` section of the form, and above the redirects at the bottom of the file:
-```erb
-# app/views/books/show.html.erb
-----------------------------------
 
+<figure><strong><code>app/views/books/show.html.erb</code></strong></figure>
+
+```erb
 <p>
   <strong>Price:</strong>
   <%= @book.price %>
@@ -638,15 +636,15 @@ Add the following code below the `Price` section of the form, and above the redi
 <h2>Reviews</h2>
 <% for review in @book.reviews %>
   <ul>
-    <li><%= review.body %>%</li>
+    <li><%= review.body %></li>
   </ul>
 <% end %>
 ```
 Next, add a new redirect to allow users to add a new review for this particular book:
-```erb
-# app/views/books/show.html.erb
-----------------------------------
 
+<figure><strong><code>app/views/books/show.html.erb</code></strong></figure>
+
+```erb
 <%= link_to 'Edit', edit_book_path(@book) %> |
 <%= link_to 'Add Review', book_reviews_path(@book) %> |
 <%= link_to 'Back', books_path %>
@@ -661,10 +659,10 @@ In [Step 5](./functionality.md) of Basic Functionality, you added validations to
 Open the file where your `Review` model is defined:
 
 Here, we want to ensure that reviews are not blank and that they don't duplicate content other users may have posted. To achieve this, add the following line to the file:
-```ruby
-# app/models/review.rb
-----------------------
 
+<figure><strong><code>app/models/review.rb</code></strong></figure>
+
+```ruby
 class Review < ApplicationRecord
   belongs_to :book
   validates :body, presence: true, uniqueness: true
