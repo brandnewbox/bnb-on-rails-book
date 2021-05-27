@@ -4,15 +4,15 @@ Input [HAML](https://haml.info/). From their website:
 
 > Haml (HTML abstraction markup language) is based on one primary principle: markup should be beautiful. It’s not just beauty for beauty’s sake either; Haml accelerates and simplifies template creation down to veritable haiku.
 
-At BNB, we use HAML's indentation-based markup to manage the nesting our HTML nodes for us. No more managing of closing `</div>` tags everywhere!
+At BNB, we use HAML's indentation-based markup to manage the nesting of our HTML nodes for us. No more managing of closing `</div>` tags everywhere!
 ![haml view](images/haml.png)
 
 ## Install haml-rails
 First, open your `Gemfile` and add the `haml-rails` gem: 
-```
-# Gemfile
----------
 
+<figure><strong><code>Gemfile</code></strong></figure>
+
+```
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 
@@ -89,10 +89,10 @@ Great work, you have converted your views!
 
 Let's look at a view to get a feel for what we will be working with. Open `app/views/books/index.html.haml`
 
-```haml
-# app/views/books/index.html.haml
----------------------------------
 
+<figure><strong><code>app/views/books/index.html.haml</code></strong></figure>
+
+```haml
 %p#notice= notice
 %h1 Books
 %table
