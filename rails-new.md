@@ -15,10 +15,9 @@ Instead of having to manage the versions of multiple different dependancies for 
 
 In your new directory make a `docker-compose.yml` file and paste in:
 
-```ruby
-# docker-compose.yml
---------------------
+<figure><strong><code>docker-compose.yml</code></strong></figure>
 
+```ruby
 version: "3"
 services:
   app:    
@@ -91,20 +90,20 @@ We are going to add a *url* to our `database.yml` file which is going to tell ou
 postgres://DATABASE_USERNAME:DATABASE_PASSWORD@DATABASE_HOST:PORT/DATABASE_NAME
 ```
 Under `development` we will add the appropriate configuration to point Rails at the Postgres service we have setup in our `docker-compose.yml` file.
-```yml
-# config/database.yml
----------------------
 
+<figure><strong><code>config/database.yml</code></strong></figure>
+
+```yml
 development:
   <<: *default
   database: bnb_library_development
   url: postgres://postgres:39dkdk3f93kkd93k20dl201kd83@postgres:5432
 ```
 The `test` environment will use the same database information on your local machine. But we use `ENV.fetch` to allow for the value to be overridden with an environment variable. This comes in handy when running tests elsewhere, i.e. CircleCI or a similar CI/CD service.
-```yml
-# config/database.yml
----------------------
 
+<figure><strong><code>config/database.yml</code></strong></figure>
+
+```yml
 test:
   <<: *default
   database: bnb_library_test

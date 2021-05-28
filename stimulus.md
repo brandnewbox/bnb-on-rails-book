@@ -8,7 +8,7 @@ However, there are several considerations to keep in mind when implementing a fr
 
 As an alternative, the team at [Basecamp](https://basecamp.com/) (the same team that wrote Rails) has created [Stimulus.js](https://stimulusjs.org/), which they describe as “a modest JavaScript framework for the HTML you already have.” Stimulus is meant to enhance a modern Rails application by working with server-side generated HTML. State lives in the [Document Object Model (DOM)](https://www.digitalocean.com/community/tutorial_series/understanding-the-dom-document-object-model), and the framework offers standard ways of interacting with elements and events in the DOM. It works side by side with [Turbolinks](https://github.com/turbolinks/turbolinks) (included in Rails 5+ by default) to improve performance and load times with code that is limited and scoped to a clearly defined purpose.
 
-In this tutorial, you will install and use Stimulus to build on an existing Rails application that offers readers information about books. The application already has a model for handling book data, but you will add a nested resource for review about individual books, allowing users to build out a body of thoughts and opinions about books. This piece runs roughly parallel to [Nested Resources](./nested-resources.md), except that we will be using JavaScript to manipulate the position and appearance of reviews on the page. We will also take a slightly different approach to building out the review model itself.
+In this tutorial, you will install and use Stimulus to build on an existing Rails application that offers readers information about books. The application already has a model for handling book data, but you will add a nested resource for reviews about individual books, allowing users to build out a body of thoughts and opinions about books. This piece runs roughly parallel to [Nested Resources](./nested-resources.md), except that we will be using JavaScript to manipulate the position and appearance of reviews on the page. We will also take a slightly different approach to building out the review model itself.
 
 ## Step 1 - Reorganizing Views with Partials
 
@@ -21,10 +21,10 @@ When we created our Review model, we generated views for our reviews. We will be
 Remove the `app/views/reviews` folder completely.
 
 Navigate to `app/controllers/reviews_controller.rb` and the contents are currently: 
-```rb
-# app/controllers/reviews_controller.rb
----------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```rb
 class ReviewsController < ApplicationController
   before_action :get_book
   before_action :set_review, only: %i[ show edit update destroy ]
@@ -101,10 +101,10 @@ class ReviewsController < ApplicationController
 end
 ```
 We will update the contents of the file to be:
-```rb
-# app/controllers/reviews_controller.rb
----------------------------------------
 
+<figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
+
+```rb
 class ReviewsController < ApplicationController
   before_action :get_book
 
@@ -133,10 +133,10 @@ As you can see we have slimmed down the file and removed much of the logic to ha
 The `books/show` view that will act as the base for reviews and all partials associated with reviews. So in this view, the first thing we will address is how we will accept user input for new reviews, and how we will present reviews back to the user.
 
 Open the file and it will currently look like this:
-```haml
-# app/views/books/show.html.haml
---------------------------------
 
+<figure><strong><code>app/views/books/show.html.haml</code></strong></figure>
+
+```haml
 %p#notice= notice
 %p
   %strong Title:
@@ -161,10 +161,10 @@ Open the file and it will currently look like this:
 Instead of building all of our functionality into this view, we will use partials — reusable templates that serve a particular function. We will create one partial for new reviews, and another to control how reviews are displayed back to the user. Throughout, we'll be thinking about how and where we can use Stimulus to manipulate the appearance of reviews on the page, since our goal is to control the presentation of reviews with JavaScript.
 
 First, below book price, add an `<h2>` header for reviews and a line to render a partial called `books/reviews`. Second remove the link to *Add Review* and the loop of reviews as we will be handling this display with Javascript:
-```haml
-# app/views/books/show.html.haml
---------------------------------
 
+<figure><strong><code>app/views/books/show.html.haml</code></strong></figure>
+
+```haml
 %p#notice= notice
 %p
   %strong Title:
@@ -186,10 +186,10 @@ First, below book price, add an `<h2>` header for reviews and a line to render a
 This will render the partial with the form builder for new review objects.
 
 Next, below the `Edit` and `Back` links, we will add a section to control the presentation of older reviews on the page. Add the following lines to the file to render a partial called `books/all`:
-```haml
-# app/views/books/show.html.haml
---------------------------------
 
+<figure><strong><code>app/views/books/show.html.haml</code></strong></figure>
+
+```haml
 %p#notice= notice
 %p
   %strong Title:
@@ -224,10 +224,10 @@ Open your project's Gemfile, which lists the gem dependencies for your project:
 bnb-library/Gemfile
 ```
 Inside the file, you will see Turbolinks and Webpacker enabled by default:
-```rb
-# bnb-library/Gemfile
----------------------
 
+<figure><strong><code>bnb-library/Gemfile</code></strong></figure>
+
+```rb
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
 gem 'webpacker', '~> 5.0'
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
@@ -238,10 +238,10 @@ Turbolinks is designed to improve performance by optimizing page loads: instead 
 
 Webpacker has created two new directories in your project's `app` directory, the directory where your main application code is located. The parent directory, `app/javascript`, will be where your project's
 JavaScript code will live, and it will have the following structure:
-```  
-# app/javascript
-----------------
 
+<figure><strong><code>app/javascript</code></strong></figure>
+
+```  
 ├── javascript
 │   ├── channels
 │   │   ├── consumer.js
@@ -252,17 +252,17 @@ JavaScript code will live, and it will have the following structure:
 
 The directory will contain two child directories: `app/javascript/packs`
 , which will have your webpack entry points, and `app/javascript/channels`,
-where you house [Action Cable](https://guides.rubyonrails.org/action_cable_overview.html) channels. When we install Stimulus you will see a auto generated folder of `app/javascript/channels`, this is where you will define your Stimulus [controllers](https://stimulusjs.org/reference/controllers). 
+where you house [Action Cable](https://guides.rubyonrails.org/action_cable_overview.html) channels. When we install Stimulus you will see a auto generated folder of `app/javascript/controllers`, this is where you will define your Stimulus [controllers](https://stimulusjs.org/reference/controllers). 
 
 We can now install Stimulus with the following command:
 ```
 dip rails webpacker:install:stimulus
 ```
 You will see output like the following, indicating that the installation was successful:
-```
-# Output
---------
 
+<figure><strong><code>Output</code></strong></figure>
+
+```
 Starting bnb-library_postgres_1 ... done
 Appending Stimulus setup code to /app/app/javascript/packs/application.js
       append  app/javascript/packs/application.js
@@ -296,7 +296,7 @@ info All dependencies
 Done in 13.31s.
 Webpacker now supports Stimulus.js 🎉
 ```
-You now have Stimulus installed and ready to use in your application. Next, we'll build out the partials that we referenced in our books `shohw` view — `books/reviews` and `books/all` — using Stimulus controllers, targets, and actions.
+You now have Stimulus installed and ready to use in your application. Next, we'll build out the partials that we referenced in our books `show` view — `books/reviews` and `books/all` — using Stimulus controllers, targets, and actions.
 
 ## Step 5 — Using Stimulus in Rails Partials
 Our `books/reviews` partial will use the [form_with form helper](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/FormHelper.html) to create a new review object. It will also make use of Stimulus's three core concepts:
@@ -312,13 +312,13 @@ First, create a new file for the partial in VSCode:
 app/views/books/_reviews.html.haml
 ```
 Inside the file, add the following code to create a new review object using the form_with helper:
-```haml
-# app/views/books/_reviews.html.haml
-------------------------------------
 
+<figure><strong><code>app/views/books/_reviews.html.haml</code></strong></figure>
+
+```haml
 = form_with model: [@book, @book.reviews.build] do |form|
   = form.text_area :body, placeholder: "Your review here"
-  = form.submit
+    = form.submit data: { disable_with: false }
 ```
 So far, this form behaves like a typical Rails form, using the `form_with` helper to build a review object with the fields defined for the `Review` model. Thus, the form has a field for the review `:body`, to which we've added a `placeholder` with a prompt for filling in a review.
 
@@ -327,69 +327,69 @@ Additionally, the form is scoped to take advantage of the collection methods tha
 Our goal now is to add some Stimulus controllers, events, and actions to control how the review data gets displayed on the page. The user will ultimately submit review data and see it posted to the page thanks to a Stimulus action.
 
 First, we'll add a controller to the form called `reviews` in a `<div>` element:
-```haml
-# app/views/books/_reviews.html.haml
-------------------------------------
 
+<figure><strong><code>app/views/books/_reviews.html.haml</code></strong></figure>
+
+```haml
 %div{data: {controller: "reviews"}}
   = form_with model: [@book, @book.reviews.build] do |form|
     = form.text_area :body, placeholder: "Your review here"
-    = form.submit
+    = form.submit data: { disable_with: false }
 ```  
 Make sure you nest the form within the `<div>` tag to scope the controller properly.
 
 Next, we'll attach an action to the form that will be triggered by the form submit event. This action will control how user input is displayed on the page. It will reference an `addBody` method that we will define in the reviews Stimulus controller:
-```haml
-# app/views/books/_reviews.html.haml
-------------------------------------
 
+<figure><strong><code>app/views/books/_reviews.html.haml</code></strong></figure>
+
+```haml
 %div{data: {controller: "reviews"}}
   = form_with model: [@book, @book.reviews.build], data: { action: "reviews#addBody" } do |form|
     = form.text_area :body, placeholder: "Your review here"
-    = form.submit
+    = form.submit data: { disable_with: false }
 ```
 We use the `:data` option with `form_with` to submit the Stimulus action as an additional HTML data attribute. The action itself has a value called an
-action descriptor made up of the following: *- The DOM event to listen for.* Here, we are using the default event associated with form elements, submit, so we do not need to specify the event in the descriptor itself. For more information about common element/event pairs, see the [Stimulus documentation](https://stimulusjs.org/reference/actions#event-shorthand). - *The controller identifier*, in our case `reviews`. - *The method that the event should invoke.* In our case, this is the `addBody` method that we will define in the controller.
+action descriptor made up of the following: *- The DOM event to listen for.* Here, we are using the default event associated with form elements, submit, so we do not need to specify the event in the descriptor itself. For more information about common element/event pairs, see the [Stimulus documentation](https://stimulusjs.org/reference/actions#event-shorthand). - *The controller identifier*, in our case `reviews`. And - *the method that the event should invoke.* In our case, this is the `addBody` method that we will define in the controller.
 
 Next, we'll attach a data target to the user input defined in the `:body`
 `<textarea>` element, since we will use this inputted value in the addBody method.
 
 Add the following `:data` option to the `<textarea>` element:
-```haml
-# app/views/books/_reviews.html.haml
-------------------------------------
 
+<figure><strong><code>app/views/books/_reviews.html.haml</code></strong></figure>
+
+```haml
 %div{data: {controller: "reviews"}}
   = form_with model: [@book, @book.reviews.build], data: { action: "reviews#addBody" } do |form|
     = form.text_area :body, placeholder: "Your review here", data: { target: "reviews.body" }
-    = form.submit
+    = form.submit data: { disable_with: false }
 ```
 Much like action descriptors, Stimulus targets have target descriptors, which include the controller identifier and the target name. In this case, `reviews` is our controller, and `body` is the target itself.
     
 As a last step, we'll add a data target for the inputted `body` values so that users will be able to see their reviews as soon as they are submitted.
 
 Add the following `<ul>` element with an add target below the form but within the parent `div`:
-```haml
-# app/views/books/_reviews.html.haml
-------------------------------------
 
+<figure><strong><code>app/views/books/_reviews.html.haml</code></strong></figure>
+
+```haml
 %div{data: {controller: "reviews"}}
   = form_with model: [@book, @book.reviews.build], data: { action: "reviews#addBody" } do |form|
     = form.text_area :body, placeholder: "Your review here", data: { target: "reviews.body" }
-    = form.submit
+    = form.submit data: { disable_with: false }
   %ul{data: {target: "reviews.add"}}
 ```
 As with the `body` target, our target descriptor includes both the name of the controller and the target — in this case, `add`.
 
 The finished partial will look like this:
-```haml
-# app/views/books/_reviews.html.haml
-------------------------------------
 
+<figure><strong><code>app/views/books/_reviews.html.haml</code></strong></figure>
+
+```haml
 %div{data: {controller: "reviews"}}
   = form_with model: [@book, @book.reviews.build], data: { action: "reviews#addBody" } do |form|
     = form.text_area :body, placeholder: "Your review here", data: { target: "reviews.body" }
-    = form.submit
+    = form.submit data: { disable_with: false }
   %ul{data: {target: "reviews.add"}}
 ```
 Once you have made these changes, you can save and close the file.
@@ -401,10 +401,10 @@ Create a new file named `_all.html.haml` in the `app/views/books/` directory:
 app/views/books/_all.html.haml
 ```
 Add the following code to the file to iterate through the collection of reviews associated with the selected book:
-```haml
-app/views/books/_all.html.haml
-------------------------------
 
+<figure><strong><code>app/views/books/_all.html.haml
+
+```haml
 - @book.reviews.each do |review|
   %ul
     %li.review
@@ -418,13 +418,13 @@ Before we do that, however, we will need to add a gem to our project so that we 
 
 Open your Gemfile:
 ```rb
-# bnb-library/Gemfile
+bnb-library/Gemfile
 ```
 Below your `haml-rails` gem, add the following line to include the [font-awe some-rails gem](https://github.com/bokmann/font-awesome-rails) in the project:
-```rb
-# bnb-library/Gemfile
----------------------
 
+<figure><strong><code>bnb-library/</code></strong></figure>
+
+```rb
 gem 'haml-rails', '~> 2.0'
 gem 'font-awesome-rails', '~>4.x'
 ```
@@ -437,10 +437,10 @@ dip bundle i
 Finally, open your application's main stylesheet, `app/assets/stylesheets/application.css`:
 
 Add the following line to include Font Awesome's styles in your project:
-```css
-# app/assets/stylesheets/application.css
-----------------------------------------
 
+<figure><strong><code>app/assets/stylesheets/application.css</code></strong></figure>
+
+```css
 *
 *= require_tree .
 *= require_self
@@ -452,10 +452,10 @@ Save and close the file.
 Back in your `app/views/books/_all.html.haml` partial, you can now add two [button_tags](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/FormTagHelper.html#method-i-button_tag) with associated Stimulus actions, which will be triggered on click events. One button will give users the option to upvote a review and the other will give them the option to remove it from the page view.
 
 Add the following code to `app/views/books/_all.html.haml`:
-```haml
-# app/views/books/_all.html.haml
---------------------------------
 
+<figure><strong><code>app/views/books/_all.html.haml</code></strong></figure>
+
+```haml
 - @book.reviews.each do |review|
   %ul
     %li.review
@@ -475,10 +475,10 @@ Open the `show` template again, where the initial call to render `books/all` is 
 app/views/books/show.html.haml
 ```
 At the bottom of the file, we have a `<div>` element that currently looks like this:
-```haml
-# app/views/books/show.html.haml
---------------------------------
 
+<figure><strong><code>app/views/books/show.html.haml</code></strong></figure>
+
+```haml
 %p#notice= notice
 %p
   %strong Title:
@@ -501,19 +501,19 @@ At the bottom of the file, we have a `<div>` element that currently looks like t
   = render 'books/all' 
 ```
 First, add a controller to this `<div> `element to scope actions and targets:
-```haml
-# app/views/books/show.html.haml
---------------------------------
 
+<figure><strong><code>app/views/books/show.html.haml</code></strong></figure>
+
+```haml
 %div{data: {controller: 'reviews'}}
   = render 'books/all' 
 ```
 Next, add a button to control the appearance of the partial on the page. This button will trigger a `showAll` method in our reviews controller.
 Add the button below the `<div>` element and above the render statement:
-```haml
-# app/views/books/show.html.haml
---------------------------------
 
+<figure><strong><code>app/views/books/show.html.haml</code></strong></figure>
+
+```haml
 %div{data: {controller: 'reviews'}}
   %button{data: {action: "reviews#showAll"}} Show Older Reviews
   = render 'books/all' 
@@ -525,20 +525,20 @@ Next, we will add a data target. The goal of setting this target is to control t
 We will therefore attach a data target called `show` to the `books/all` partial, and set its default style to [visibility:hidden](https://developer.mozilla.org/en-US/docs/Web/CSS/visibility). This will hide the partial unless users opt in to seeing it by clicking on the button.
 
 Add the following `<div>` element with the `show` target and `style` definition below the button and nest the partial render statement within it:
-```haml
-# app/views/books/show.html.haml
---------------------------------
 
+<figure><strong><code>app/views/books/show.html.haml</code></strong></figure>
+
+```haml
 %div{data: {controller: 'reviews'}}
   %button{data: {action: "reviews#showAll"}} Show Older Reviews
   %div{data: {target: 'reviews.show'}, style: 'visibility:hidden'}
     = render 'books/all' 
 ```
 The finished `show` template will look like this:
-```haml
-# app/views/books/show.html.haml
---------------------------------
 
+<figure><strong><code>app/views/books/show.html.haml</code></strong></figure>
+
+```haml
 %p#notice= notice
 %p
   %strong Title:
@@ -575,13 +575,13 @@ Installing Stimulus created the `app/javascript/controllers` directory, which is
 
 Create a file called reviews_controller.js in the `app/javascript/controllers` directory:
 ```rb
-# app/javascript/controllers/reviews_controller.js
+app/javascript/controllers/reviews_controller.js
 ```
 First, at the top of the file, extend Stimulus's built-in `Controller` class:
-```js
-# app/javascript/controllers/reviews_controller.js
---------------------------------------------------
 
+<figure><strong><code>app/javascript/controllers/reviews_controller.js</code></strong></figure>
+
+```js
 import { Controller } from "stimulus"
 
 export default class extends Controller {
@@ -589,10 +589,10 @@ export default class extends Controller {
 }
 ```
 Next, add the following target definitions to the file:
-```js
-# app/javascript/controllers/reviews_controller.js
---------------------------------------------------
 
+<figure><strong><code>app/javascript/controllers/reviews_controller.js</code></strong></figure>
+
+```js
 import { Controller } from "stimulus"
 
 export default class extends Controller {
@@ -603,10 +603,10 @@ export default class extends Controller {
 Defining targets in this way will allow us to access them in our methods with the `this.target-nameTarget` property, which gives us the first matching target element. So, for example, to match the `body` data target defined in our targets array, we would use `this.bodyTarget`. This property allows us to manipulate things like input values or css styles.
 
 Next, we can define the `addBody` method, which will control the appearance of new reviews on the page. Add the following code below the target definitions to define this method:
-```js
-# app/javascript/controllers/reviews_controller.js
---------------------------------------------------
 
+<figure><strong><code>app/javascript/controllers/reviews_controller.js</code></strong></figure>
+
+```js
 import { Controller } from "stimulus"
 
 export default class extends Controller {
@@ -623,10 +623,10 @@ This method defines a content variable with the [let keyword](https://www.digita
 Next, the method adds this review input to the `add` target we added to the `<ul>` element below the form builder in the `books/reviews` partial. It does this using the [Element.insertAdjacentHTML() method](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML), which will insert the content of the new review, set in the `content` variable, before the `add` target element. We've also enclosed the new review in an `<li>` element, so that new reviews appear as bulleted list items.
 
 Next, below the `addBody` method, we can add the `showAll` method, which will control the appearance of older reviews on the page:
-```js
-# app/javascript/controllers/reviews_controller.js
---------------------------------------------------
 
+<figure><strong><code>app/javascript/controllers/reviews_controller.js</code></strong></figure>
+
+```js
 import { Controller } from "stimulus"
 
 export default class extends Controller {
@@ -647,10 +647,10 @@ Here, we again use the `this.target-nameTarget` property to match our `show` tar
 Below `showAll`, we'll next add an `upvote` method, to allow users to “upvote” reviews on the page by attaching the [free](https://fontawesome.com/icons?d=gallery&m=free) Font Awesome `check-circle` icon to a particular review.
 
 Add the following code to define this method:
-```js
-# app/javascript/controllers/reviews_controller.js
---------------------------------------------------
 
+<figure><strong><code>app/javascript/controllers/reviews_controller.js</code></strong></figure>
+
+```js
 export default class extends Controller {
 
   showAll() {
@@ -666,10 +666,10 @@ export default class extends Controller {
 Here, we're creating a `review` variable that will target the closest `<li>` element with the class `review` — the class we attached to each `<li>` element in our loop iteration in `books/all`. This will target the closest review and add the `check-circle` icon just inside `<li>` element, after its last child.
 
 Next, we'll use a similar method to hide reviews on the page. Add the following code below the `upvote` method to define a `remove` method:
-```js
-# app/javascript/controllers/reviews_controller.js
---------------------------------------------------
 
+<figure><strong><code>app/javascript/controllers/reviews_controller.js</code></strong></figure>
+
+```js
 export default class extends Controller {
   upvote() {
     let review = event.target.closest(".review");
@@ -685,10 +685,10 @@ export default class extends Controller {
 Once again, our `review` variable will target the closest `<li>` element with the class `review`. It will then set the visibility property to `"hidden"` to hide the review on the page.
 
 The finished controller file will now look like this:
-```js
-# app/javascript/controllers/reviews_controller.js
---------------------------------------------------
 
+<figure><strong><code>app/javascript/controllers/reviews_controller.js</code></strong></figure>
+
+```js
 import { Controller } from "stimulus"
 
 export default class extends Controller {
@@ -723,15 +723,15 @@ With one final change to the books `index` view you will be ready to test out yo
 
 Open the file:
 ```rb
-# app/views/books/index.html.haml
+app/views/books/index.html.haml
 ```
 In place of the `link_to` helpers that were autogenerated for us to display and destroy books, we'll use `button_to` helpers. This will help us work with generated HTML code instead of the default Rails JavaScript assets.
    
 Replace the existing `link_to` helpers in the file with the following `button_to` helpers:
-```haml
-# app/views/books/index.html.haml
----------------------------------
 
+<figure><strong><code>app/views/books/index.html.haml</code></strong></figure>
+
+```haml
 %tbody
   - @books.each do |book|
     %tr
