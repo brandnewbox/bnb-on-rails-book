@@ -6,10 +6,10 @@ Remember how cool it was the first time you generated scaffolding using the [rai
 
 ## Step 1 - Add the gem
 To start using Trestle, first add it to your Gemfile: 
-```rb
-# bnb-library/Gemfile
----------------------
 
+<figure><strong><code>bnb-library/Gemfile</code></strong></figure>
+
+```rb
 gem "haml-rails", "~> 2.0"
 gem 'font-awesome-rails', '~>4.x'
 gem 'trestle'
@@ -19,10 +19,10 @@ Bundle your Gemfile:
 dip bundle install
 ```
 You can expect to see an output similar to: 
-```rb
-# output
---------
 
+<figure><strong><code>output</code></strong></figure>
+
+```rb
 Fetching gem metadata from https://rubygems.org/............
 Fetching gem metadata from https://rubygems.org/.
 Resolving dependencies...
@@ -59,10 +59,10 @@ Now we will take advantage of the install generator baked into Trestle to create
 dip rails generate trestle:install
 ```
 which will create a `app/admin` directory and some accompanying stylesheets.
-```rb
-# output
---------
 
+<figure><strong><code>output</code></strong></figure>
+
+```rb
 Starting bnb-library_postgres_1 ... done
 Running via Spring preloader in process 19
 
@@ -108,10 +108,10 @@ We now have the desired Admin functionality in place, but we need to head back t
 ## Step 3 - Update View Actions
 
 Navigate to `app/views/books/index.html.haml` in VSCode. The current contents of the file are: 
-```haml
-# app/views/books/index.html.haml
----------------------------------
 
+<figure><strong><code>app/views/books/index.html.haml</code></strong></figure>
+
+```haml
 %p#notice= notice
 %h1 Books
 %table
@@ -135,10 +135,10 @@ Navigate to `app/views/books/index.html.haml` in VSCode. The current contents of
 = link_to 'Home', home_index_path, class: 'btn btn-primary btn-sm'
 ```
 We are going to remove the `button_to` helpers for the `edit` and `destroy` actions, as these actions will be reserved for admins only.
-```haml
-# app/views/books/index.html.haml
----------------------------------
 
+<figure><strong><code>app/views/books/index.html.haml</code></strong></figure>
+
+```haml
 %p#notice= notice
 %h1 Books
 %table
@@ -160,10 +160,10 @@ We are going to remove the `button_to` helpers for the `edit` and `destroy` acti
 = link_to 'Home', home_index_path, class: 'btn btn-primary btn-sm'
 ```
 We are also going to remove the `link_to` helper routing to the `new_book_path`. Again, this action will be reserved for admins only.
-```haml
-# app/views/books/index.html.haml
----------------------------------
 
+<figure><strong><code>app/views/books/index.html.haml</code></strong></figure>
+
+```haml
 %p#notice= notice
 %h1 Books
 %table
@@ -185,13 +185,13 @@ We are also going to remove the `link_to` helper routing to the `new_book_path`.
 ```
 We also need to remove the `edit` book action from `app/views/books/show.html.haml`. Open the file in VSCode.
 ```rb
-# app/views/books/show.html.haml
+app/views/books/show.html.haml
 ```
 The contents of the file are currently: 
-```haml
-# app/views/books/show.html.haml
---------------------------------
 
+<figure><strong><code>app/views/books/show.html.haml</code></strong></figure>
+
+```haml
 %p#notice= notice
 %p
   %strong Title:
@@ -215,10 +215,10 @@ The contents of the file are currently:
     = render 'books/all'
 ```
 Remove the `edit` `link_to` helper:
-```haml
-# app/views/books/show.html.haml
---------------------------------
 
+<figure><strong><code>app/views/books/show.html.haml</code></strong></figure>
+
+```haml
 %p#notice= notice
 %p
   %strong Title:
@@ -242,13 +242,13 @@ Remove the `edit` `link_to` helper:
 ```
 Finally, let's update your `config/routes.rb` file:
 ```rb
-# config/routes.rb
+config/routes.rb
 ```
 Update the `:books` resources to only include only the `:show`, and `:index` resource so that a user cannot access these routes if they were to know the URL:
-```rb
-# config/routes.rb
-------------------
 
+<figure><strong><code>config/routes.rb</code></strong></figure>
+
+```rb
 .. .
   resources :books, only: [:show, :index] do 
     resources :reviews
