@@ -5,10 +5,10 @@ Using the pagination library, [will_paginate](https://github.com/mislav/will_pag
 ## Step 1 - Installing will_paginate
 
 To start using [will_paginate](https://github.com/mislav/will_paginate), first add it to your `Gemfile`: 
-```rb
-# bnb-library/Gemfile
----------------------
 
+<figure><strong><code>bnb-library/Gemfile</code></strong></figure>
+
+```rb
 gem 'trestle-auth'
 gem 'faker', :git => 'https://github.com/faker-ruby/faker.git', :branch => 'master'
 gem 'will_paginate'
@@ -28,10 +28,10 @@ dip up
 [will_paginate](https://github.com/mislav/will_paginate) makes creating a pagination query extremely simple. All we to do is update our `books_controller` `index` view and action. 
 
 Open the file: 
-```rb
-# app/controllers/books_controller.rb
--------------------------------------
 
+<figure><strong><code>app/controllers/books_controller.rb</code></strong></figure>
+
+```rb
 class BooksController < ApplicationController
   before_action :set_book, only: %i[ show edit update destroy ]
 
@@ -43,10 +43,10 @@ class BooksController < ApplicationController
 .. .
 ```
 Instead of querying for `Book.all` we are going to instead utilize the `.paginate` method included in the [will_paginate](https://github.com/mislav/will_paginate) gem. It takes a paramter of `:page` that will recieve its value, and let [will_paginate](https://github.com/mislav/will_paginate) know what page to display when you (the user) toggle between different page links.
-```rb
-# app/controllers/books_controller.rb
--------------------------------------
 
+<figure><strong><code>app/controllers/books_controller.rb</code></strong></figure>
+
+```rb
 class BooksController < ApplicationController
   before_action :set_book, only: %i[ show edit update destroy ]
 
@@ -61,10 +61,9 @@ In order to see the pagination links we must update our `index` view.
 
 Open the file: 
 
-```haml
-# app/views/books/index.html.haml
----------------------------------
+<figure><strong><code>app/views/books/index.html.haml</code></strong></figure>
 
+```haml
 %h1 Books
 %table
   %thead
@@ -84,10 +83,10 @@ Open the file:
 = link_to 'Home', home_index_path, class: 'btn btn-primary btn-sm'
 ```
 Below the `%br` tag, add `will_paginate @books` nested within a div with the class of `paginate` to display the links:
-```haml
-# app/views/books/index.html.haml
----------------------------------
 
+<figure><strong><code>app/views/books/index.html.haml</code></strong></figure>
+
+```haml
 %h1 Books
 %table
   %thead
