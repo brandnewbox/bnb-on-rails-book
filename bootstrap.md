@@ -14,11 +14,11 @@ dip rails generate controller home index
 ```
 With the controller created, you'll need to modify the root view in the project's `config/routes.rb` file — the file that specifies the application's route declarations — since the root view is currently set to the books `index` view.
 
-Open the file `config/routes.rb` and replace the root decleration with `'home#index'`:
-```rb
-# config/routes.rb
-------------------
+Open the file `config/routes.rb` and replace the root declaration with `'home#index'`:
 
+<figure><strong><code>config/routes.rb</code></strong></figure>
+
+```rb
 root 'home#index'
 ```
 This will set the `home` controller's `index` view as the root of the application, making it possible to branch off to other parts of the application from there.
@@ -38,15 +38,15 @@ Many of Bootstrap's components require [JQuery](https://jquery.com/) and [Popper
 
 Next, open your main webpack configuration file, `config/webpack/environment.js` with VSCode:
 ```rb
-# config/webpack/environment.js
+config/webpack/environment.js
 ```
 Inside the file, add the webpack library, along with a [ProvidePlugin](https://webpack.js.org/plugins/provide-plugin/) that tells Bootstrap how to interpret JQuery and Popper variables.
 
 Add the following code to the file:
-```js
-# config/webpack/environment.js
--------------------------------
 
+<figure><strong><code>config/webpack/environment.js</code></strong></figure>
+
+```js
 const { environment } = require("@rails/webpacker")
 const webpack = require("webpack")
 
@@ -67,13 +67,13 @@ Save and close the file when you are finished editing.
 
 Next, open your main webpack entry point file, `app/javascript/packs/application.js`:
 ```rb
-# app/javascript/packs/application.js
+app/javascript/packs/application.js
 ```
 Inside the file, add the following `import` statements to import Bootstrap and the custom `scss` styles file that you will create next:
-```js
-# app/javascript/packs/application.js
--------------------------------------
 
+<figure><strong><code>app/javascript/packs/application.js</code></strong></figure>
+
+```js
 import Rails from "@rails/ujs"
 import Turbolinks from "turbolinks"
 import * as ActiveStorage from "@rails/activestorage"
@@ -91,27 +91,27 @@ Save and close the file when you are finished editing.
 
 Next, create a `stylesheets` directory in VSCode for your application style sheet:
 ```rb
-# app/javascript/stylesheets
+app/javascript/stylesheets
 ```
 Create and open the custom styles file:
 ```rb
-# app/javascript/stylesheets/application.scss
+app/javascript/stylesheets/application.scss
 ```
 This is an scss file, which uses [Sass](https://sass-lang.com/) instead of [CSS](https://en.wikipedia.org/wiki/Cascading_Style_Sheets). Sass, or Syntactically Awesome Style Sheets, is a CSS extension language that lets developers integrate programming logic and conventions like shared variables into styling rules.
 
 In the file, add the following statements to import the custom Bootstrap `scss` styles and Google fonts for the project:
-```scss
-# app/javascript/stylesheets/application.scss
----------------------------------------------
 
+<figure><strong><code>app/javascript/stylesheets/application.scss</code></strong></figure>
+
+```scss
 @import "~bootstrap/scss/bootstrap";
 @import url('https://fonts.googleapis.com/css?family=Merriweather:400,700');
 ```
 Next, add the following custom variable definitions and styles for the application:
-```scss
-# app/javascript/stylesheets/application.scss
----------------------------------------------
 
+<figure><strong><code>app/javascript/stylesheets/application.scss</code></strong></figure>
+
+```scss
 $white: white; 
 $black: black;
 
@@ -130,7 +130,7 @@ h1, h2 {
   font-weight: bold;
 } 
 
-p{
+p {
   background: $black;
   color: $white;
   font-family: 'Merriweather', sans-serif;
@@ -169,8 +169,8 @@ a:visited {
 }
 
 img, video, audio {
-margin-top: 20px;
-max-width: 80%;
+  margin-top: 20px;
+  max-width: 80%;
 }
 
 caption {
@@ -188,10 +188,10 @@ Our first step in integrating Bootstrap conventions and components into the proj
 First, open `app/views/layouts/application.html.haml`, your application's main layout file:
 
 Currently, the file looks like this:
-```haml
-# app/views/layouts/application.html.haml
------------------------------------------
 
+<figure><strong><code>app/views/layouts/application.html.haml</code></strong></figure>
+
+```haml
 !!!
 %html
   %head
@@ -211,25 +211,25 @@ In the `<body>` of the page, a `yield` statement tells Rails to insert the conte
 
 This raises a couple of questions: Do we want the home view for the application to be the same as what users see when they view the book application? And if we want these views to be somewhat different, how do we implement that?
 
-The first step will be deciding what should be replicated across all application views. We can leave everything included under the `<header>` in place, since it is primarily tags and metadata that we want to be present on all application pages. Within this section, however, we can also add a few things that will customize all of our application views.
+The first step will be deciding what should be replicated across all application views. We can leave everything included under the `<head>` in place, since it is primarily tags and metadata that we want to be present on all application pages. Within this section, however, we can also add a few things that will customize all of our application views.
            
 First, replace the existing `title` code with code that will render the application title in a more dynamic way:
-```haml
-# app/views/layouts/application.html.haml
------------------------------------------
 
+<figure><strong><code>app/views/layouts/application.html.haml</code></strong></figure>
+
+```haml
 !!!
 %html
   %head
     %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
     %title= content_for?(:title) ? yield(:title) : "About Books"
-    %meta{:content => "width=device-width,initial-scale=1", :name => "viewport"}
+    %meta{:content => "width=device-width,initial-scale=1", :name => "viewport"}/
 ```
 Add a `<meta>` tag to include a description of the site:
-```haml
-# app/views/layouts/application.html.haml
------------------------------------------
 
+<figure><strong><code>app/views/layouts/application.html.haml</code></strong></figure>
+
+```haml
 !!!
 %html
   %head
@@ -241,10 +241,10 @@ Add a `<meta>` tag to include a description of the site:
 With this code in place, you can add a navigation partial to the layout. Ideally, each of our application's pages should include a [navbar](https://getbootstrap.com/docs/4.0/components/navbar/) component at the top of the page, so that users can easily navigate from one part of the site to another.
 
 Under the `<body>` tag, add a `<header>` tag and the following render statement:
-```haml
-# app/views/layouts/application.html.haml
------------------------------------------
 
+<figure><strong><code>app/views/layouts/application.html.haml</code></strong></figure>
+
+```haml
 %body
   %header= render 'layouts/navigation'
   = yield
@@ -254,10 +254,10 @@ This `<header>` tag allows you to organize your page content, separating the nav
 Finally, you can add a `<main>` element tag and some logic to control which view, and thus which layout, the application will render. This code uses the [content_for method](https://api.rubyonrails.org/classes/ActionView/Helpers/CaptureHelper.html#method-i-content_for) to reference a content identifier that we will associate with our books layout in the next step.
    
 Replace the existing `yield` statement with the following content:
-```haml
-# app/views/layouts/application.html.haml
------------------------------------------
 
+<figure><strong><code>app/views/layouts/application.html.haml</code></strong></figure>
+
+```haml
 %body
   %header= render 'layouts/navigation'
   %main{:role => "main"}= content_for?(:content) ? yield(:content) : yield
@@ -273,13 +273,13 @@ In addition to the changes you made to the application layout in the previous St
 
 First, create and open a file for the shared navbar partial:
 ```rb
-# app/views/layouts/_navigation.html.haml
+app/views/layouts/_navigation.html.haml
 ```
 Add the following code to the file to create the navbar:
-```haml
-# app/views/layouts/_navigation.html.haml
------------------------------------------
 
+<figure><strong><code>app/views/layouts/_navigation.html.haml</code></strong></figure>
+
+```haml
 %nav.navbar.navbar-dark.navbar-static-top.navbar-expand-md
   .container
     %button.navbar-toggler.collapsed{"aria-expanded" => "false", "data-target" => "#bs-example-navbar-collapse-1", "data-toggle" => "collapse", :type => "button"}
@@ -297,22 +297,22 @@ Save and close the file when you are finished editing.
 
 Next, create and open a file in the `layouts` directory for the books layout:
 ```rb
-# app/views/layouts/books.html.haml
+app/views/layouts/books.html.haml
 ```
 Before adding layout features, we will need to ensure that the content of the layout is set as the `:content` block that we reference in the main application layout. Add the following lines to the file to create the block:
-```haml
-# app/views/layouts/books.html.haml
------------------------------------
 
+<figure><strong><code>app/views/layouts/books.html.haml</code></strong></figure>
+
+```haml
 - content_for :content do
 ```
 The code we're about to write in this block will be rendered inside the `:content` block in the `app/views/layouts/application.html.haml` file whenever a books view is requested by a controller.
 
 Next, inside the block itself, add the following code to create a [jumbotron](https://getbootstrap.com/docs/4.3/components/jumbotron/) component and two [containers](https://getbootstrap.com/docs/4.3/layout/overview/#containers):
-```haml
-# app/views/layouts/books.html.haml
------------------------------------
 
+<figure><strong><code>app/views/layouts/books.html.haml</code></strong></figure>
+
+```haml
 .jumbotron.text-center
   %h1 Book Info
 .container
@@ -328,14 +328,14 @@ Next, inside the block itself, add the following code to create a [jumbotron](ht
 The first container includes a `yield` statement that will insert the content from the `book` controller's views, while the second includes a reminder that certain books are always friendly and welcoming.
 
 Finally, at the bottom of the file, add the following `render` statement to render the application layout:
-```haml
-# app/views/layouts/books.html.haml
------------------------------------
 
-.col-lg-6
-  %p
-    .caption
-      You can always count on a book to teach you something!
+<figure><strong><code>app/views/layouts/books.html.haml</code></strong></figure>
+
+```haml
+      .col-lg-6
+        %p
+          .caption
+            You can always count on a book to be friendly and welcoming!
 = render template: "layouts/application"
 ```
 This books layout will provide the content for the named `:content` block in the main application layout; it will then render the application layout itself to ensure that our rendered application pages have everything we want at the application-wide level.
@@ -346,13 +346,13 @@ We now have our partials and layouts in place, but we haven't yet created the vi
    
 Open that file now:
 ```rb
-# app/views/home/index.html.haml
+app/views/home/index.html.haml
 ```
 The structure of this view will match the layout we defined for book views, with a main jumbotron component and two containers. Replace the boilerplate code in the file with the following:
-```haml
-# app/views/home/index.html.haml
---------------------------------
 
+<figure><strong><code>app/views/home/index.html.haml</code></strong></figure>
+
+```haml
 .jumbotron
   .container
     %h1 Looking for a new Book?
@@ -370,7 +370,7 @@ The structure of this view will match the layout we defined for book views, with
     .col-lg-6
       %h3 Books are important
       %p
-        Books allow readers to travel without using their feet, 
+        Books allow readers to travel without using their feet.
         Books give wings to our imagination.
 ```
 Now, when landing on the home page of the application, users will have a clear way to navigate to the book section of the application, by clicking on the *Get Book Info* button. This button points to the `book_path` — the helper that maps to the routes associated with the `books` controller.
@@ -381,27 +381,27 @@ Our last task will be to transform some of the `link_to` methods in our applicat
 
 Open the books `index` view to start:
 ```rb
-# app/views/books/index.html.haml
+app/views/books/index.html.haml
 ```
 At the bottom of the file, locate the `link_to` method that directs to the `new` book view:
-```haml
-# app/views/books/index.html.haml
-----------------------------------
 
+<figure><strong><code>app/views/books/index.html.haml</code></strong></figure>
+
+```haml
 = link_to 'New Book', new_book_path
 ```
 Modify the code to turn this link into a button that uses Bootstrap's `btn btn-primary btn-sm"` class:
-```haml
-# app/views/books/index.html.haml
-----------------------------------
 
+<figure><strong><code>app/views/books/index.html.haml</code></strong></figure>
+
+```haml
 = link_to 'New Book', new_book_path, class: 'btn btn-primary btn-sm'
 ```
 Next, add a link to the application home page:
-```haml
-# app/views/books/index.html.haml
-----------------------------------
 
+<figure><strong><code>app/views/books/index.html.haml</code></strong></figure>
+
+```haml
 = link_to 'New Book', new_book_path, class: 'btn btn-primary btn-sm'
 = link_to 'Home', home_index_path, class: 'btn btn-primary btn-sm'
 ```
@@ -409,24 +409,24 @@ Save and close the file when you are finished editing.
 
 Next, open the `new` view:
 ```rb
-# app/views/books/new.html.haml
+app/views/books/new.html.haml
 ```
 Add the button styles to the `link_to` method at the bottom of the file:
-```haml
-# app/views/books/new.html.haml
--------------------------------
 
+<figure><strong><code>app/views/books/new.html.haml</code></strong></figure>
+
+```haml
 = link_to 'Back', books_path, class: 'btn btn-primary btn-sm'
 ```
 Save and close the file. Open the `edit` view:
 ```rb
-# app/views/books/new.html.haml
+app/views/books/new.html.haml
 ```
 Currently, the `link_to` methods are arranged like this:
-```haml
-# app/views/books/new.html.haml
--------------------------------
 
+<figure><strong><code>app/views/books/new.html.haml</code></strong></figure>
+
+```haml
 %h1 Editing Book
 = render 'form', book: @book
 = link_to 'Show', @book
@@ -434,10 +434,10 @@ Currently, the `link_to` methods are arranged like this:
 = link_to 'Back', books_path
 ```
 Change their arrangement on the page and add the button styles, so that the code looks like this:
-```haml
-# app/views/books/new.html.haml
--------------------------------
 
+<figure><strong><code>app/views/books/new.html.haml</code></strong></figure>
+
+```haml
 = link_to 'Show', @book, class: 'btn btn-primary btn-sm'
 = link_to 'Back', books_path, class: 'btn btn-primary btn-sm'
 ```
@@ -445,22 +445,22 @@ Save and close the file.
 
 Finally, open the `show` view:
 ```rb
-# app/views/books/show.html.haml
+app/views/books/show.html.haml
 ```
 Find the following `link_to` methods:
-```haml
-# app/views/books/show.html.haml
--------------------------------
 
+<figure><strong><code>app/views/books/show.html.haml</code></strong></figure>
+
+```haml
 = link_to 'Edit', edit_book_path(@book)
 |
 = link_to 'Back', books_path
 ```
 Change them to look like this:
-```haml
-# app/views/books/show.html.haml
--------------------------------
 
+<figure><strong><code>app/views/books/show.html.haml</code></strong></figure>
+
+```haml
 = link_to 'Edit', edit_book_path(@book), class: 'btn btn-primary btn-sm'
 = link_to 'Back', books_path, class: 'btn btn-primary btn-sm'
 ```
