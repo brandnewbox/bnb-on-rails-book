@@ -5,10 +5,10 @@ For development and testing purposes a developer may want to work with a large d
 ## Step 1 - Installing Faker
 
 To start using [Faker](https://github.com/faker-ruby/faker), first add it to your `Gemfile`: 
-```rb
-# bnb-library/Gemfile
----------------------
 
+<figure><strong><code>bnb-library/Gemfile</code></strong></figure>
+
+```rb
 gem 'devise'
 gem 'trestle-auth'
 gem 'faker', :git => 'https://github.com/faker-ruby/faker.git', :branch => 'master'
@@ -21,9 +21,10 @@ dip bundle install
 ## Step 2 - Building Seeds
 
 Open `db/seeds.rb`. Here we are going to add: 
+
+<figure><strong><code>db/seeds.rb</code></strong></figure>
+
 ```rb
-# db/seeds.rb
--------------
 require 'faker'
 
 [
