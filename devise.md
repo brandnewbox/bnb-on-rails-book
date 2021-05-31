@@ -4,10 +4,10 @@ In [Step 6](./functionality.md) - Adding Authentication we added the [http_basic
 
 ## Step 1 - Add the gem
 Open your Gemfile. To start using Devise, first add it to your Gemfile: 
-```rb
-# bnb-library/Gemfile
----------------------
 
+<figure><strong><code>bnb-library/Gemfile</code></strong></figure>
+
+```rb
 gem 'font-awesome-rails', '~>4.x'
 gem 'trestle'
 gem 'devise'
@@ -17,10 +17,10 @@ Bundle your Gemfile:
 dip bundle install
 ```
 You can expect to see an output similar to: 
-```rb
-# output
---------
 
+<figure><strong><code>output</code></strong></figure>
+
+```rb
 Fetching gem metadata from https://rubygems.org/............
 Fetching gem metadata from https://rubygems.org/.
 Resolving dependencies...
@@ -58,10 +58,10 @@ Now we will take advantage of the install generator baked into Devise to create 
 ```
 dip rails generate devise:install
 ```
-```
-# output
---------
 
+<figure><strong><code>output</code></strong></figure>
+
+```
 Starting bnb-library_postgres_1 ... done
 Running via Spring preloader in process 19
       create  config/initializers/devise.rb
@@ -102,10 +102,10 @@ Depending on your application's configuration some manual setup may be required:
 ==============================================
 ```
 The generator will install an initializer which describes *ALL* of Devise's configuration options. Mentioned in *1.* of the output, we are going to add `config.action_mailer.default_url_options` to our development environment at `config/environments/development.rb`. At the bottom of the file add:
-```rb
-# config/environments/development.rb
--------------------------------
 
+<figure><strong><code>config/environments/development.rb</code></strong></figure>
+
+```rb
   # Devise configuration
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 end
@@ -115,10 +115,10 @@ Using the `generate devise MODEL` command we are going to create the `User` mode
 dip rails generate devise User
 ```
 This will create a `User` model and configure it with the default Devise modules. The generator also configures your `config/routes.rb` file to point to the `Devise` controller.
-```
-# output
---------
 
+<figure><strong><code>output</code></strong></figure>
+
+```
 Starting bnb-library_postgres_1 ... done
 Running via Spring preloader in process 19
     invoke  active_record
@@ -133,10 +133,10 @@ Running via Spring preloader in process 19
 From the output you can see that a migration file was generated at `db/migrate/20210331193612_devise_create_users.rb` (your timestamp will be different).
 
 Open the file: 
-```rb
-# 20210331193612_devise_create_users.rb
----------------------------------------
 
+<figure><string><code>20210331193612_devise_create_users.rb</code></strong></figure>
+
+```rb
 # frozen_string_literal: true
 
 class DeviseCreateUsers < ActiveRecord::Migration[6.1]
@@ -194,10 +194,10 @@ We have created a `Devise` `User` model, let's merge this with our `Trestle` adm
 
 ## Step 3 - Add Trestle Authentication 
 To integrate [trestle-auth](https://github.com/TrestleAdmin/trestle-auth#option-2-devise-integration), first add it to your application's `Gemfile`:
-```
-# bnb-library/Gemfile
----------------------
 
+<figure><strong><code>bnb-library/Gemfile</code></strong></figure>
+
+```
 gem 'trestle'
 gem 'devise'
 gem 'trestle-auth'
@@ -207,10 +207,10 @@ Bundle your Gemfile:
 dip bundle install
 ```
 You can expect to see an output similar to: 
-```rb
-# output
---------
 
+<figure><strong><code>output</code></strong></figure>
+
+```rb
 Fetching gem metadata from https://rubygems.org/............
 Fetching gem metadata from https://rubygems.org/.
 Resolving dependencies...
