@@ -18,7 +18,6 @@ In your new directory make a `docker-compose.yml` file and paste in:
 <figure><strong><code>docker-compose.yml</code></strong></figure>
 
 ```ruby
-
 version: "3"
 services:
   app:    
