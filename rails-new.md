@@ -1,6 +1,6 @@
 # Step 1 — Creating an Empty Container
 
-We are going to house our Rails Application within a container, so in order to do this, we must first create it! On your local machine, make an empty directory.
+We are going to house our Rails Application within a container, so in order to do this, we must first create it! On your machine, make an empty directory.
 
 ```
 mkdir bnb-library
@@ -75,10 +75,10 @@ You will see a good deal of output telling you what Rails is creating for your n
 - *gemfile* : This file lists the gem dependencies for your application. A gem is a Ruby software package, and a Gemfile allows you to manage your project's software needs. 
 - *app*: The app directory is where your main application code lives. This includes the models, controllers, views, assets, helpers, and mailers that make up the application itself. Rails gives you some application-level boilerplate for the MCV model to start out in files like `app/models/application_record.rb`, `app/controllers/application_controller.rb`, and `app/views/layouts/application.html.erb`.
 - *config*: This directory contains your application's configuration settings.
-- *config/routes*: Your application's route declarations live in this file.
+- *config/routes.rb*: Your application's route declarations live in this file.
 - *config/application.rb*: General settings for your application components are located in this file. 
 - *config/environments*: This directory is where configuration settings for your environments live. Rails includes three environments by default: `development`, `test`, and `production`. 
-- *config/database*: Database configuration settings live in this file, which is broken into four sections: `default`, `development`, `production`, and `test`. Thanks to the Gemfile that came with the `rails new bnb-library --database=postgresql`, which included the `pg` gem, our `config/database.yml` file has its adapter parameter set to postgresql already, specifying that we will use an postgresql database with this application. 
+- *config/database.yml*: Database configuration settings live in this file, which is broken into four sections: `default`, `development`, `production`, and `test`. Thanks to the Gemfile that came with the `rails new bnb-library --database=postgresql`, which included the `pg` gem, our `config/database.yml` file has its adapter parameter set to postgresql already, specifying that we will use an postgresql database with this application. 
 - *db*: This folder includes a directory for database migrations called migrate, along with the `schema.rb` and `seeds.rb` files. `schema.db` contains information about your database, while `seeds.rb` is where you can place seed data for the database.
 
 ## Step 3 - Starting Your Application
