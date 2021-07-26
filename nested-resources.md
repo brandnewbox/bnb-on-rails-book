@@ -634,11 +634,12 @@ Add the following code below the `Price` section of the form, and above the redi
 </p>
 
 <h2>Reviews</h2>
-<% for review in @book.reviews %>
   <ul>
+  <% @books.reviews.each do |review| %>
     <li><%= review.body %></li>
+  <% end %>
   </ul>
-<% end %>
+
 ```
 Next, add a new redirect to allow users to add a new review for this particular book:
 
