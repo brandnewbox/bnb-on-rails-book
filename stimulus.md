@@ -402,7 +402,7 @@ app/views/books/_all.html.haml
 ```
 Add the following code to the file to iterate through the collection of reviews associated with the selected book:
 
-<figure><strong><code>app/views/books/_all.html.haml
+<figure><strong><code>app/views/books/_all.html.haml</code></strong></figure>
 
 ```haml
 - @book.reviews.each do |review|
@@ -410,7 +410,7 @@ Add the following code to the file to iterate through the collection of reviews 
     %li.review
       = review.body
 ```
-This code uses a each loop to iterate through each review instance in the collection of review objects associated with a particular book.
+This code uses an each loop to iterate through each review instance in the collection of review objects associated with a particular book.
 
 We can now add some Stimulus actions to this partial to control the appearance of reviews on the page. Specifically, we will add actions that will control upvotes and whether or not reviews are visible on the page.
 
