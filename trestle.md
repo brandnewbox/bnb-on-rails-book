@@ -127,14 +127,14 @@ Navigate to `app/views/books/index.html.haml` in VSCode. The current contents of
         %td= book.title
         %td= book.description
         %td= book.price
-        %td= button_to 'Show', book_path(id: book.id), method: :get
-        %td= button_to 'Edit', edit_book_path(id: book.id), method: :get                    |
-        %td= button_to 'Destroy', book_path(id: book.id), method: :delete
+        %td= link_to 'Show', book_path(book)
+        %td= link_to 'Edit', edit_book_path(book)
+        %td= link_to 'Destroy', book_path(book), method: :delete
 %br/
 = link_to 'New Book', new_book_path, class: 'btn btn-primary btn-sm'
 = link_to 'Home', home_index_path, class: 'btn btn-primary btn-sm'
 ```
-We are going to remove the `button_to` helpers for the `edit` and `destroy` actions, as these actions will be reserved for admins only.
+We are going to remove the `link_to` helpers for the `edit` and `destroy` actions, as these actions will be reserved for admins only.
 
 <figure><strong><code>app/views/books/index.html.haml</code></strong></figure>
 
@@ -154,7 +154,7 @@ We are going to remove the `button_to` helpers for the `edit` and `destroy` acti
         %td= book.title
         %td= book.description
         %td= book.price
-        %td= button_to 'Show', book_path(id: book.id), method: :get
+        %td= link_to 'Show', book_path(book)
 %br/
 = link_to 'New Book', new_book_path, class: 'btn btn-primary btn-sm'
 = link_to 'Home', home_index_path, class: 'btn btn-primary btn-sm'
@@ -179,7 +179,7 @@ We are also going to remove the `link_to` helper routing to the `new_book_path`.
         %td= book.title
         %td= book.description
         %td= book.price
-        %td= button_to 'Show', book_path(id: book.id), method: :get
+        %td= link_to 'Show', book_path(book)
 %br/
 = link_to 'Home', home_index_path, class: 'btn btn-primary btn-sm'
 ```
