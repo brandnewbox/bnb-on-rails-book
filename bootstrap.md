@@ -359,7 +359,7 @@ The structure of this view will match the layout we defined for book views, with
     %h3 Ready to get reading?
     %br
     %p
-      = button_to 'Get Book Info', books_path, method: :get, class: "btn btn-primary btn-lg"
+      = link_to 'Get Book Info', books_path, class: "btn btn-primary btn-lg"
 .container
   .row
     .col-lg-6
