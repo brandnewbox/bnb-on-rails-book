@@ -78,7 +78,7 @@ Open the file:
         %td= book.title
         %td= book.description
         %td= book.price
-        %td= button_to 'Show', book_path(id: book.id), method: :get
+        %td= link_to 'Show', book_path(book)
 %br/
 = link_to 'Home', home_index_path, class: 'btn btn-primary btn-sm'
 ```
@@ -101,7 +101,7 @@ Below the `%br` tag, add `will_paginate @books` nested within a div with the cla
         %td= book.title
         %td= book.description
         %td= book.price
-        %td= button_to 'Show', book_path(id: book.id), method: :get
+        %td= link_to 'Show', book_path(book)
 %br/
 .paginate
   = will_paginate @books
