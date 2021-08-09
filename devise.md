@@ -134,7 +134,7 @@ From the output you can see that a migration file was generated at `db/migrate/2
 
 Open the file: 
 
-<figure><string><code>20210331193612_devise_create_users.rb</code></strong></figure>
+<figure><strong><code>20210331193612_devise_create_users.rb</code></strong></figure>
 
 ```rb
 # frozen_string_literal: true
