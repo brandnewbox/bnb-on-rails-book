@@ -81,7 +81,20 @@ You will see a good deal of output telling you what Rails is creating for your n
 - *config/database.yml*: Database configuration settings live in this file, which is broken into four sections: `default`, `development`, `production`, and `test`. Thanks to the Gemfile that came with the `rails new bnb-library --database=postgresql`, which included the `pg` gem, our `config/database.yml` file has its adapter parameter set to postgresql already, specifying that we will use an postgresql database with this application. 
 - *db*: This folder includes a directory for database migrations called migrate, along with the `schema.rb` and `seeds.rb` files. `schema.db` contains information about your database, while `seeds.rb` is where you can place seed data for the database.
 
-## Step 3 - Starting Your Application
+## Step 3 - Version Control
+
+Now that you've got your awesome app already to go, let's setup version control so we don't lose any of our work. Create a new repository on GitHub with nothing in it. Then, from within your working directory:
+
+```
+git init
+git add .
+git commit -m "First commit"
+git branch -M main
+git remote add origin git@github.com:brandnewbox/my-great-project.git
+git push -u origin main
+```
+
+## Step 4 - Starting Your Application
 
 We are going to want to interact with our app in the browser, but first, we must setup our database.
 
