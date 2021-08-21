@@ -58,7 +58,7 @@ YAY! You are now at a bash terminal inside the container you just created.
 
 ## Step 2 — Creating a New Rails Project
 
-Let's install rails and setup a new application. We'll start by going into the root folder to make a app named *bnb-library*. Then we will move the files into their final resting place in `/app`.
+Let's install rails and setup a new application. We'll start by going into the root folder to make a app named *bnb-library*. Then we will move the files into their final resting place in `/app`. The `shopt` command in there helps us move the hidden files (like `.gitignore`) as well.
 
 ```ruby
 # from within your bash terminal
@@ -66,6 +66,7 @@ Let's install rails and setup a new application. We'll start by going into the r
 cd ..
 gem install rails
 rails new bnb-library --database=postgresql
+shopt -s dotglob nullglob
 mv bnb-library/* app
 exit
 ```
