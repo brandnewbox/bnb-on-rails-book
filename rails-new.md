@@ -33,7 +33,7 @@ services:
   postgres:
     image: postgres:11-alpine
     environment:
-      - POSTGRES_PASSWORD=39dkdk3f93kkd93k20dl201kd83
+      - POSTGRES_PASSWORD=password
     ports:
       - '5432:5432'
     volumes:
@@ -111,7 +111,7 @@ Under `development` we will add the appropriate configuration to point Rails at 
 development:
   <<: *default
   database: bnb_library_development
-  url: postgres://postgres:39dkdk3f93kkd93k20dl201kd83@postgres:5432
+  url: postgres://postgres:password@postgres:5432
 ```
 The `test` environment will use the same database information on your local machine. But we use `ENV.fetch` to allow for the value to be overridden with an environment variable. This comes in handy when running tests elsewhere, i.e. CircleCI or a similar CI/CD service.
 
@@ -121,7 +121,7 @@ The `test` environment will use the same database information on your local mach
 test:
   <<: *default
   database: bnb_library_test
-  url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:39dkdk3f93kkd93k20dl201kd83@postgres:5432" } %>
+  url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:password@postgres:5432" } %>
 ```
 
 Then run the setup command. This will spin up an instance of the `app` container to run the command in (as well as an instance of the `postgres` service that the `app` depends on).
