@@ -35,7 +35,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=password
     ports:
-      - '5432:5432'
+      - '5433:5432'
     volumes:
       - my_dbdata:/var/lib/postgresql/data
 volumes:
@@ -64,7 +64,7 @@ Let's install rails and setup a new application. We'll start by going into the r
 # from within your bash terminal
 
 cd ..
-gem install rails
+gem install rails:6.1.4.4
 rails new bnb-library --database=postgresql
 shopt -s dotglob nullglob
 mv bnb-library/* app
