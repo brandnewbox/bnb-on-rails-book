@@ -24,6 +24,7 @@ This is the `hello-world` stuff. You can probably find this everywhere else on t
 * [What is Rails?](./rails-intro.html)
 * [Creating a New Rails Project](./rails-new.html)
 * [Scaffolding](./scaffolding.html)
+* [Console](./console.html)
 * [Basic Functionality](./functionality.html)
 
 ## Progressive Enhancements
