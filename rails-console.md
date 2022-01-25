@@ -3,7 +3,7 @@
 Now that you have scaffolded a resource let's talk about ways in which you can access your application outside of a browser. Rails provides a command line interface for you to access various parts of your application.
 
 The Rails console helps with:
-- replacing `puts` statements in your code to figure out the shape of an object
+- interacting with objects outside the browser to discover what methods and properties they have
 - accessing your model data and inserting/updating new models
 - testing out a new chunk of code
 
