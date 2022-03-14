@@ -39,3 +39,7 @@ At Brand New Box, we find ourselves using a lot of the same technology concepts 
 * [Securing the Application](./devise.html)
 * [Seed the Application](./seeds.html)
 * [Add Pagination](./paginate.html)
+
+## Additional Guides
+
+* [Connecting to databases](./databases.html)
