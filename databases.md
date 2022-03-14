@@ -17,7 +17,7 @@ Since our databases run inside of Docker there are a few steps we need to take i
       - 5433:5432
     ```
     
-    The number on the right is the port inside the container that is being exposed (5432 is the default postgres port) and the number on the left is the port to expose it to on your development machine.
+    When reading these port lines the way to understand them is: `- Y:X` means “I am exposing X port inside the container as Y port on my development machine. So in this case we are exposing port 5432 (the default postgres port) inside of the container as port 5433 on our development machines (we choose 5433 to prevent conflicts if with a postgres installation on your development machine).
 
 
 2. Forward the exposed port to your local machine. From the VS Code ports tab ensure that the exposed port on the development machine is forwarded to your local computer. So in our example above we would need to ensure port `5433` is forwarded to our local machine.
@@ -31,7 +31,7 @@ Since our databases run inside of Docker there are a few steps we need to take i
         - **User**: `postgres` (most likely this by default, but it should match whatever is specified in your docker-compose.yml file)
         - **Password**: `password` (this should also match whatever is in your docker-compose.yml file)
         - **Default Database**: Set this to the development database name in database.yml
-    - Test and ensure the connection works and then you are set up! 🎉
+    - Test (make sure you have your database container running on your development machine by using `dip up`) and ensure the connection works and then you are set up! 🎉
         
 ### Navgating data in the database
 
