@@ -10,12 +10,14 @@ A database viewer is an application which allows you to connect to your database
 
 Since our databases run inside of Docker there are a few steps we need to take in order to connect to it.
 
-1. Look at what port your database is exposed on in your `docker-compose.yml` file. Underneath your `db` or `postgres` service you should have a line something like
+1. Look at what port your database is exposed on in your `docker-compose.yml` file. Underneath your `db` or `postgres` service you should have a ports line which shows which ports are exposed from your service.
+    
     ```yaml
     ports:
       - 5433:5432
     ```
-    The number on the right is the port inside the container that is being exposed (5432 is the default postgres port) and the number on the left is the port to expose it to your development machine on.
+    
+    The number on the right is the port inside the container that is being exposed (5432 is the default postgres port) and the number on the left is the port to expose it to on your development machine.
 
 
 2. Forward the exposed port to your local machine. From the VS Code ports tab ensure that the exposed port on the development machine is forwarded to your local computer. So in our example above we would need to ensure port `5433` is forwarded to our local machine.
