@@ -74,7 +74,7 @@ exit
 After creating the rails project and exiting the container, we should run the `chown` command to own the files that were just created.
 
 ```
-sudo chown -R yourname:yourname * .git
+sudo chown -R $(whoami):$(whoami) * .git
 ```
 
 You will see a good deal of output telling you what Rails is creating for your new project. We are going to highlight some of the significant files, directories, and commands that you can find in the output of running `rails new`:
