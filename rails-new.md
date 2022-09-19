@@ -71,6 +71,12 @@ mv bnb-library/* app
 exit
 ```
 
+After creating the rails project and exiting the container, we should run the `chown` command to own the files that were just created.
+
+```
+sudo chown -R yourname:yourname * .git
+```
+
 You will see a good deal of output telling you what Rails is creating for your new project. We are going to highlight some of the significant files, directories, and commands that you can find in the output of running `rails new`:
 
 - *gemfile* : This file lists the gem dependencies for your application. A gem is a Ruby software package, and a Gemfile allows you to manage your project's software needs. 
