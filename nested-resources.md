@@ -635,7 +635,7 @@ Add the following code below the `Price` section of the form, and above the redi
 
 <h2>Reviews</h2>
   <ul>
-  <% @books.reviews.each do |review| %>
+  <% @book.reviews.each do |review| %>
     <li><%= review.body %></li>
   <% end %>
   </ul>
