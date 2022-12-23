@@ -32,12 +32,7 @@ end
 ```
 Now, when users navigate to your application root, they will see a full listing of books, and have the opportunity to create a new book entry, look at existing entries, and edit or delete given entries.
 
-Save the file and exit your editor when you are finished editing. You can do so by pressing `CTRL+X `, `Y`, then `ENTER`.
-
-Start your Rails server once again
-```
-dip up
-```
+Navigate to `http://localhost:3000`, instead of seeing the "Hello World" page, you should see a list of books.
 
 Your application landing page will look like this:
 ![Homepage](images/homepage.png)
@@ -84,15 +79,9 @@ Now that you have tested your application's basic functionality, you can add som
 
 ## Step 5 — Adding Validations
 
-Your book application can accept input from users, but imagine a case where a user attempts to create a book without adding a title to it, or creates an entry for a book that's already in the database. You can create mechanisms to check data before it gets entered into the database by adding validations to your models. Since your application's logic is located in its models, validating data input here makes more sense than doing so elsewhere in the application.
+Your book application can accept input from users, but imagine a case where a user attempts to create a book without adding a title to it, or creates an entry for a book that's already in the database. You can create mechanisms to check data before it gets entered into the database by adding validations to your models. Since your application's logic is located in its models, validating data input here makes more sense than doing so elsewhere in the application. Rails provides [lots of great validation options](https://guides.rubyonrails.org/active_record_validations.html) for us to use.
 
 Note that we will not cover writing validation tests in this tutorial, but you can find out more about testing by consulting [the Rails documentation](https://guides.rubyonrails.org/testing.html).
-
-If you haven't stopped the server yet, go ahead and do that by typing (in separate terminal)
-```
-dip down
-```
-or press `CTRL + C`
 
 Navigate to, and open your `book.rb` model file:
 
@@ -129,12 +118,6 @@ We are less concerned here with the uniqueness of the description, as long as th
 
 Save the file when you are finished.
 
-Start up your server once again
-```
-dip up
-```
-Navigate to your application's root at `http://localhost:3000`
-
 Click on *New Book*. In the form, add “A Walk in The Park” to the *Title* field, “Good day” to the *Description* field, and 10 to the *Price* field. Then click on *Create Book*. You should see the following warning:
 ![Validation Error](images/title-validation.png)
 Now, let's see if we can check our other validation. Click *Back* to return to the homepage, and then *New Book* once again. In the new form, enter “High Noon” in the *Title* field, 10 to the *Price* field, and leave *Description* field blank. Clicking *Create Book* will trigger the following warning:
@@ -145,8 +128,6 @@ With these changes, your application has some validations in place to ensure con
 With validations in place, we have some guarantees about the data that's being saved to the database. But what about users? If we don't want any and all users adding to the database, then we should add some authentication measures to ensure that only permitted users can add books. In order to do this, we'll use the [http_basic_authenticate_with](https://api.rubyonrails.org/classes/ActionController/HttpAuthentication/Basic.html) method, which will allow us to create a username and password combination to authenticate users.
  
 There are a number of ways to authenticate users with Rails, including working with the [bcrypt](https://rubygems.org/gems/bcrypt/versions/3.1.12) or (our standard) [devise](https://rubygems.org/gems/devise) gems. For now, however, we will add a method to our application controller that will apply to actions across our application. This will be useful if we add more controllers to the application in the future.
-
-Stop your server again with `CTRL+C`.
 
 Open the file that defines your `ApplicationController`, `application_controller.rb`
 
@@ -174,12 +155,10 @@ In a more robust setup, you would not want to hardcode values in this way, but f
 
 Save `app/controllers/application_controller.rb` when you are finished editing. You can now test authentication in action.
 
-Start up your server once again
-```
-dip up
-```
 On the landing page, click on the *New Book* button. This will trigger the following authentication window:
+
 ![Authentication Window](images/authentication-window.png)
+
 If you enter the username and password combination you added to `app/controllers/application_controller.rb`, you will be able to securely create a new book.
 
 You now have a working book application, complete with data validations and a basic authentication scheme!
