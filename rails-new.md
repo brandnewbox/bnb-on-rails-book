@@ -21,19 +21,21 @@ In your new directory make a `docker-compose.yml` file and paste in:
 version: "3"
 services:
   app:    
-    image: brandnewbox/bnb-ruby:2.7-postgresql
+    image: brandnewbox/bnb-ruby:3.1-postgresql
     command: bundle exec puma -C config/puma.rb
+    environment:
+      - DATABASE_URL=postgres://postgres:monkey@postgresservice:5432
     volumes:
       - .:/app:cached
       - bundle_cache:/usr/local/bundle
     ports:
       - "3000:3000"
     depends_on:
-      - postgres
-  postgres:
+      - postgresservice
+  postgresservice:
     image: postgres:11-alpine
     environment:
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_PASSWORD=monkey
     ports:
       - '5433:5432'
     volumes:
@@ -60,11 +62,13 @@ YAY! You are now at a bash terminal inside the container you just created.
 
 Let's install rails and setup a new application. We'll start by going into the root folder to make a app named *bnb-library*. Then we will move the files into their final resting place in `/app`. The `shopt` command in there helps us move the hidden files (like `.gitignore`) as well.
 
+At the time of this writing, this will install Rail 7.0.4.
+
 ```ruby
 # from within your bash terminal
 
 cd ..
-gem install rails:6.1.4.4
+gem install rails
 rails new bnb-library --database=postgresql
 shopt -s dotglob nullglob
 mv bnb-library/* app
@@ -105,43 +109,30 @@ git push -u origin main
 
 We are going to want to interact with our app in the browser, but first, we must setup our database.
 
-We are going to add a *url* to our `database.yml` file which is going to tell our rails application a few things. Here is the breakdown...
-```
-postgres://DATABASE_USERNAME:DATABASE_PASSWORD@DATABASE_HOST:PORT/DATABASE_NAME
-```
-Under `development` we will add the appropriate configuration to point Rails at the Postgres service we have setup in our `docker-compose.yml` file.
+The application knows how to connect to the postgres service because we are passing the `DATABASE_URL` in from the environment in docker-compose, where this is well-known.
 
-<figure><strong><code>config/database.yml</code></strong></figure>
-
-```yml
-development:
-  <<: *default
-  database: bnb_library_development
-  url: postgres://postgres:password@postgres:5432
-```
-The `test` environment will use the same database information on your local machine. But we use `ENV.fetch` to allow for the value to be overridden with an environment variable. This comes in handy when running tests elsewhere, i.e. CircleCI or a similar CI/CD service.
-
-<figure><strong><code>config/database.yml</code></strong></figure>
-
-```yml
-test:
-  <<: *default
-  database: bnb_library_test
-  url: <%= ENV.fetch("DATABASE_URL") { "postgres://postgres:password@postgres:5432" } %>
-```
-
-Then run the setup command. This will spin up an instance of the `app` container to run the command in (as well as an instance of the `postgres` service that the `app` depends on).
+All we need to do is run the setup command. This will spin up an instance of the `app` container to run the command in (as well as an instance of the `postgres` service that the `app` depends on).
 
 ```
-dip rails db:setup
+dip setup
 ```
-You can expect an output similar to 
+
+This will run all the commands in `bin/setup` that helps prepare your application. You can expect an output similar to 
+
 ```
-Running via Spring preloader in process 19
+== Installing dependencies ==
+The Gemfile's dependencies are satisfied
+
+== Preparing database ==
 Created database 'bnb_library_development'
-Created database 'bnb_library_test'
+
+== Removing old logs and tempfiles ==
+
+== Restarting application server ==
 ```
+
 Now let's start your application's server and see the landing page rails has created for us.
+
 ```
 dip up
 ```
