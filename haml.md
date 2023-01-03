@@ -1,4 +1,4 @@
-Working with [ERB](https://www.tutorialspoint.com/ruby-on-rails/rails-and-html-erb.htm) can get the job done, but there are fantasic alternatives to achieve the same result with much less code. 
+Working with [ERB](https://www.tutorialspoint.com/ruby-on-rails/rails-and-html-erb.htm) can get the job done, but there are fantasic alternatives to achieve the same result with much less code.
 
 Input [HAML](https://haml.info/). From their website:
 
@@ -8,7 +8,7 @@ At BNB, we use HAML's indentation-based markup to manage the nesting of our HTML
 ![haml view](images/haml.png)
 
 ## Install haml-rails
-First, open your `Gemfile` and add the `haml-rails` gem: 
+First, open your `Gemfile` and add both the `haml-rails` and the `html2haml` gems:
 
 <figure><strong><code>Gemfile</code></strong></figure>
 
@@ -20,6 +20,7 @@ First, open your `Gemfile` and add the `haml-rails` gem:
 gem 'bootsnap', '>= 1.4.4', require: false
 
 gem "haml-rails", "~> 2.0"
+gem "html2haml"
 ```
 Then bundle your gemfile with
 ```
@@ -30,7 +31,7 @@ Haml-rails comes with an amazing command to convert all existing views from `.er
 ```
 dip rails haml:erb2haml
 ```
-You will see an output similar to: 
+You will see an output similar to:
 ```
 Starting bnb-library_postgres_1 ... done
 Generating HAML for app/views/books/edit.html.erb...
@@ -86,6 +87,8 @@ Task complete!
 No .erb files found. Task will now exit.
 ```
 Great work, you have converted your views!
+
+After you do this make sure to stop your server, `dip down` and then `dip up`. You will encounter a `NoMethodError in Books#index` error. If you follow the error it will lead you to the `_book.html.haml` partial. On line 13 you will see `@book.reviews.each`. If you change `@book` to just `book` this error will clear. 
 
 Let's look at a view to get a feel for what we will be working with. Open `app/views/books/index.html.haml`
 

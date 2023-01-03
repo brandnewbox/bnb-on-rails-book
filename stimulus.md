@@ -16,11 +16,11 @@ You have created a Review model and controller, so the last thing to think about
 
 In this step, you will map out your views and partials, which will be the starting point for your work with Stimulus.
 
-When we created our Review model, we generated views for our reviews. We will be updating this to handle them through our `books/show` view. 
+When we created our Review model, we generated views for our reviews. We will be updating this to handle them through our `books/show` view.
 
 Remove the `app/views/reviews` folder completely.
 
-Navigate to `app/controllers/reviews_controller.rb` and the contents are currently: 
+Navigate to `app/controllers/reviews_controller.rb` and the contents are currently:
 
 <figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
 
@@ -31,7 +31,7 @@ class ReviewsController < ApplicationController
 
   # GET /reviews or /reviews.json
   def index
-    @reviews = @book.reviews 
+    @reviews = @book.reviews
   end
 
   # GET /reviews/1 or /reviews/1.json
@@ -125,7 +125,7 @@ class ReviewsController < ApplicationController
 
   def review_params
     params.require(:review).permit(:body, :book_id)
-  end 
+  end
 end
 ```
 As you can see we have slimmed down the file and removed much of the logic to handle the responses and redirects with Stimulus.
@@ -209,100 +209,16 @@ Next, below the `Edit` and `Back` links, we will add a section to control the pr
 = link_to 'Back', books_path
 
 %div
-  = render 'books/all' 
+  = render 'books/all'
 ```
 The <div> element will be useful when we start integrating Stimulus into this file.
 Once you are finished making these edits, save and close the file. With the changes you've made on the Rails side, you can now move on to installing and integrating Stimulus into your application.
 
-
-## Step 2 — Installing Stimulus
-
-The first step in using Stimulus will be to install and configure our application to work with it. This will include making sure we have the correct dependencies, including the [Yarn](https://yarnpkg.com/) package manager and [Webpacker](https://github.com/rails/webpacker), the gem that will allow us to work with the JavaScript pre-processor and bundler [webpack](https://webpack.js.org/). With these dependencies in place, we will be able to install Stimulus and use JavaScript to manipulate events and elements in the DOM.
-
-Open your project's Gemfile, which lists the gem dependencies for your project:
-```
-bnb-library/Gemfile
-```
-Inside the file, you will see Turbolinks and Webpacker enabled by default:
-
-<figure><strong><code>bnb-library/Gemfile</code></strong></figure>
-
-```rb
-# Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
-gem 'webpacker', '~> 5.0'
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
-gem 'turbolinks', '~> 5'
-```
-Turbolinks is designed to improve performance by optimizing page loads: instead of having link clicks navigate to a new page, Turbolinks intercepts these click events and makes the page request using [Asynchronous JavaScript and HTML (AJAX)](https://en.wikipedia.org/wiki/Ajax_(programming)). It then replaces the body of the current page and merges the contents of the `<head>` sections, while the JavaScript
-`window` and `document` objects and the `<html>` element persist between renders. This addresses one of the main causes of slow page load times: the reloading of CSS and JavaScript resources.
-
-Webpacker has created two new directories in your project's `app` directory, the directory where your main application code is located. The parent directory, `app/javascript`, will be where your project's
-JavaScript code will live, and it will have the following structure:
-
-<figure><strong><code>app/javascript</code></strong></figure>
-
-```  
-├── javascript
-│   ├── channels
-│   │   ├── consumer.js
-│   │   └── index.js
-│   └── packs
-│       └── application.js
-```
-
-The directory will contain two child directories: `app/javascript/packs`
-, which will have your webpack entry points, and `app/javascript/channels`,
-where you house [Action Cable](https://guides.rubyonrails.org/action_cable_overview.html) channels. When we install Stimulus you will see a auto generated folder of `app/javascript/controllers`, this is where you will define your Stimulus [controllers](https://stimulusjs.org/reference/controllers). 
-
-We can now install Stimulus with the following command:
-```
-dip rails webpacker:install:stimulus
-```
-You will see output like the following, indicating that the installation was successful:
-
-<figure><strong><code>Output</code></strong></figure>
-
-```
-Starting bnb-library_postgres_1 ... done
-Appending Stimulus setup code to /app/app/javascript/packs/application.js
-      append  app/javascript/packs/application.js
-Creating controllers directory
-      create  app/javascript/controllers
-      create  app/javascript/controllers/hello_controller.js
-      create  app/javascript/controllers/index.js
-Installing all Stimulus dependencies
-         run  yarn add stimulus from "."
-yarn add v1.22.10
-[1/4] Resolving packages...
-[2/4] Fetching packages...
-info fsevents@2.3.2: The platform "linux" is incompatible with this module.
-info "fsevents@2.3.2" is an optional dependency and failed compatibility check. Excluding it from installation.
-info fsevents@1.2.13: The platform "linux" is incompatible with this module.
-info "fsevents@1.2.13" is an optional dependency and failed compatibility check. Excluding it from installation.
-[3/4] Linking dependencies...
-warning " > webpack-dev-server@3.11.2" has unmet peer dependency "webpack@^4.0.0 || ^5.0.0".
-warning "webpack-dev-server > webpack-dev-middleware@3.7.3" has unmet peer dependency "webpack@^4.0.0 || ^5.0.0".
-[4/4] Building fresh packages...
-success Saved lockfile.
-success Saved 5 new dependencies.
-info Direct dependencies
-└─ stimulus@2.0.0
-info All dependencies
-├─ @stimulus/core@2.0.0
-├─ @stimulus/multimap@2.0.0
-├─ @stimulus/mutation-observers@2.0.0
-├─ @stimulus/webpack-helpers@2.0.0
-└─ stimulus@2.0.0
-Done in 13.31s.
-Webpacker now supports Stimulus.js 🎉
-```
-You now have Stimulus installed and ready to use in your application. Next, we'll build out the partials that we referenced in our books `show` view — `books/reviews` and `books/all` — using Stimulus controllers, targets, and actions.
-
-## Step 5 — Using Stimulus in Rails Partials
+## Step 2 — Using Stimulus in Rails Partials
 Our `books/reviews` partial will use the [form_with form helper](https://api.rubyonrails.org/v5.2.3/classes/ActionView/Helpers/FormHelper.html) to create a new review object. It will also make use of Stimulus's three core concepts:
-controllers, targets, and actions. These concepts work as follows: 
-- Controllers are JavaScript classes that are defined in JavaScript modules and exported as the module's default object. Through controllers, you have access to particular HTML elements and the Stimulus Application instance defined in `app/javascript/packs/application.js`. 
-- Targets allow you to reference particular HTML elements by name, and are associated with particular controllers. 
+controllers, targets, and actions. These concepts work as follows:
+- Controllers are JavaScript classes that are defined in JavaScript modules and exported as the module's default object. Through controllers, you have access to particular HTML elements and the Stimulus Application instance defined in `app/javascript/packs/application.js`.
+- Targets allow you to reference particular HTML elements by name, and are associated with particular controllers.
 - Actions control how DOM events are handled by controllers, and are also associated with particular controllers. They create a connection between the HTML element associated with the controller, the methods defined in the controller, and a DOM event listener.
 
 In our partial, we're first going to build a form as we normally would using Rails. We will then add a Stimulus controller, action, and targets to the form in order to use JavaScript to control how new reviews get added to the page.
@@ -335,7 +251,7 @@ First, we'll add a controller to the form called `reviews` in a `<div>` element:
   = form_with model: [@book, @book.reviews.build] do |form|
     = form.text_area :body, placeholder: "Your review here"
     = form.submit data: { disable_with: false }
-```  
+```
 Make sure you nest the form within the `<div>` tag to scope the controller properly.
 
 Next, we'll attach an action to the form that will be triggered by the form submit event. This action will control how user input is displayed on the page. It will reference an `addBody` method that we will define in the reviews Stimulus controller:
@@ -365,7 +281,7 @@ Add the following `:data` option to the `<textarea>` element:
     = form.submit data: { disable_with: false }
 ```
 Much like action descriptors, Stimulus targets have target descriptors, which include the controller identifier and the target name. In this case, `reviews` is our controller, and `body` is the target itself.
-    
+
 As a last step, we'll add a data target for the inputted `body` values so that users will be able to see their reviews as soon as they are submitted.
 
 Add the following `<ul>` element with an add target below the form but within the parent `div`:
@@ -428,7 +344,7 @@ Below your `haml-rails` gem, add the following line to include the [font-awe som
 gem 'haml-rails', '~> 2.0'
 gem 'font-awesome-rails', '~>4.x'
 ```
-Save and close the file. 
+Save and close the file.
 
 Next, install the gem:
 ```
@@ -498,7 +414,7 @@ At the bottom of the file, we have a `<div>` element that currently looks like t
 = link_to 'Back', books_path
 
 %div
-  = render 'books/all' 
+  = render 'books/all'
 ```
 First, add a controller to this `<div> `element to scope actions and targets:
 
@@ -506,7 +422,7 @@ First, add a controller to this `<div> `element to scope actions and targets:
 
 ```haml
 %div{data: {controller: 'reviews'}}
-  = render 'books/all' 
+  = render 'books/all'
 ```
 Next, add a button to control the appearance of the partial on the page. This button will trigger a `showAll` method in our reviews controller.
 Add the button below the `<div>` element and above the render statement:
@@ -516,7 +432,7 @@ Add the button below the `<div>` element and above the render statement:
 ```haml
 %div{data: {controller: 'reviews'}}
   %button{data: {action: "reviews#showAll"}} Show Older Reviews
-  = render 'books/all' 
+  = render 'books/all'
 ```
 Again, we only need to identify our `reviews` controller and `showAll` method here — the action will be triggered by a click event.
 
@@ -532,7 +448,7 @@ Add the following `<div>` element with the `show` target and `style` definition 
 %div{data: {controller: 'reviews'}}
   %button{data: {action: "reviews#showAll"}} Show Older Reviews
   %div{data: {target: 'reviews.show'}, style: 'visibility:hidden'}
-    = render 'books/all' 
+    = render 'books/all'
 ```
 The finished `show` template will look like this:
 
@@ -560,17 +476,17 @@ The finished `show` template will look like this:
 %div{data: {controller: 'reviews'}}
   %button{data: {action: "reviews#showAll"}} Show Older Reviews
   %div{data: {target: 'reviews.show'}, style: 'visibility:hidden'}
-    = render 'books/all' 
+    = render 'books/all'
 ```
 Save and close the file when you are finished editing.
 
 With this template and its associated partials finished, you can move on to creating the controller with the methods you've referenced in these files.
 
-## Step 6 — Creating the Stimulus Controller
-Installing Stimulus created the `app/javascript/controllers` directory, which is where webpack is loading our application context from, so we will create our reviews controller in this directory. This controller will include each of the methods we referenced in the previous step: 
-- `addBody()`, to add new reviews. 
-- `showAll()`, to show older reviews. 
-- `remove()`, to remove reviews from the current view. 
+## Step 3 — Creating the Stimulus Controller
+Installing Stimulus created the `app/javascript/controllers` directory, which is where webpack is loading our application context from, so we will create our reviews controller in this directory. This controller will include each of the methods we referenced in the previous step:
+- `addBody()`, to add new reviews.
+- `showAll()`, to show older reviews.
+- `remove()`, to remove reviews from the current view.
 - `upvote()`, to attach an upvote icon to reviews.
 
 Create a file called reviews_controller.js in the `app/javascript/controllers` directory:
@@ -643,7 +559,7 @@ export default class extends Controller {
 }
 ```
 Here, we again use the `this.target-nameTarget` property to match our `show` target, which is attached to the `<div>` element with the `books/all` partial. We gave it a default style, `"visibility:hidden"`, so in this method, we simply change the style to `"visible"`. This will show the partial to users who have opted into seeing older reviews.
-       
+
 Below `showAll`, we'll next add an `upvote` method, to allow users to “upvote” reviews on the page by attaching the [free](https://fontawesome.com/icons?d=gallery&m=free) Font Awesome `check-circle` icon to a particular review.
 
 Add the following code to define this method:
@@ -718,9 +634,9 @@ Save and close the file when you are finished editing.
 
 With your Stimulus controller in place, you can move on to making some final changes to the `index` view and testing your application.
 
-## Step 7 — Testing the Application
-  
-You are now ready to test your application. 
+## Step 4 — Testing the Application
+
+You are now ready to test your application.
 
 Next, if you have not stopped your server since adding `font-awesome` you will need to stop then start your server again.
 ```
