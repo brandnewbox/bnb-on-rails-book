@@ -88,7 +88,7 @@ No .erb files found. Task will now exit.
 ```
 Great work, you have converted your views!
 
-After you do this make sure to stop your server, `dip down` and then `dip up`. You will encounter a `NoMethodError in Books#index` error. If you follow the error it will lead you to the `_book.html.haml` partial. On line 13 you will see `@book.reviews.each`. If you change `@book` to just `book` this error will clear. 
+After you do this make sure to stop your server, `dip down` and then `dip up`. 
 
 Let's look at a view to get a feel for what we will be working with. Open `app/views/books/index.html.haml`
 
@@ -117,4 +117,5 @@ Let's look at a view to get a feel for what we will be working with. Open `app/v
 %br/
 = link_to 'New Book', new_book_path
 ```
+
 See that the file name has changed from `.erb` to `.haml`. We are no longer using closing tags to specify parent and children elements, instead we now use nesting. Be aware, spacing and indentation matters!
