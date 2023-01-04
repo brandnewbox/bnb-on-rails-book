@@ -20,7 +20,7 @@ dip rails generate scaffold Reviews body:text book:references
 With body:text, we're telling Rails to include a `body` field in the `reviews` database table — the table that maps to the `Review` model. We're also including the `:references` keyword, which sets up an association between the `Book` and `Review` models. Specifically, this will ensure that a [foreign key](https://en.wikipedia.org/wiki/Foreign_key) representing each book entry in the `books` database is added to the `reviews` database.
 
 Once you have run the command, you will see output confirming the resources that Rails has generated for the application. Before moving on, you can check your database migration file to look at the relationship that now exists between your models and database tables.
-          
+
 You will see the following (the timestamp in the filename will be different):
 
 <figure><strong><code>db/migrate/20210324201444_create_reviews.rb</code></strong></figure>
@@ -109,7 +109,7 @@ Let's update our route declaration to make :books the parent of :reviews. Update
 ------------------
 
 Rails.application.routes.draw do
-  resources :books do 
+  resources :books do
     resources :reviews
   end
   root "books#index"
@@ -122,7 +122,7 @@ With these changes in place, you can move on to updating your reviews controller
 
 ## Step 3 — Updating the Reviews Controller
 The association between our models gives us methods that we can use to create new review instances associated with particular books. To use these methods, we will need to add them our review controller.
- 
+
 Open the review controller file, and currently, the file looks like this:
 
 <figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
@@ -198,7 +198,7 @@ class ReviewsController < ApplicationController
     end
 end
 ```
- 
+
 Like our books controller, this controller's methods work with instances of the associated `Review` class. For example, the `new` method creates a new instance of the `Review` class, the `index` method grabs all instances of the class, and the `set_review` method uses `find` and `params` to select a particular review by `id`. If, however, we want our review instances to be associated with particular book instances, then we will need to modify this code, since the
 `Review` class is currently operating as an independent entity.
 
@@ -225,7 +225,7 @@ Next, add the corresponding filter to the *top* of the file, before the existing
 class ReviewsController < ApplicationController
   before_action :get_book
 ```
-   
+
 This will ensure that `get_book` runs before each action defined in the file.
 
 Next, you can use this @book instance to rewrite the `index` method. Instead of grabbing all instances of the `Review` class, we want this method to return all review instances associated with a particular book instance.
@@ -237,7 +237,7 @@ Modify the index method to look like this:
 ```ruby
 # GET /reviews or /reviews.json
 def index
-  @reviews = @book.reviews 
+  @reviews = @book.reviews
 end
 ```
 The `new` method will need a similar revision, since we want a new review instance to be associated with a particular book. To achieve this, we can make use of the `build` method, along with our local @book instance variable.
@@ -279,7 +279,7 @@ end
 Next, take a look at the `update` method. This method uses a `@review` instance variable, which is not explicitly set in the method itself. Where does this variable come from?
 
 Take a look at the filters at the top of the file. The second, auto-generated `before_action` filter provides an answer:
- 
+
 The `update` method (like `show`, `edit`, and `destroy`) takes a `@review` variable from the `set_review` method. That method, listed under the `get_book` method with our other private methods, currently looks like this:
 
 <figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
@@ -346,7 +346,7 @@ def destroy
   end
 end
 ```
-This is the last change you will make. You now have a reviews controller that looks like this: 
+This is the last change you will make. You now have a reviews controller that looks like this:
 
 <figure><strong><code>app/controllers/reviews_controller.rb</code></strong></figure>
 
@@ -357,7 +357,7 @@ class ReviewsController < ApplicationController
 
   # GET /reviews or /reviews.json
   def index
-    @reviews = @book.reviews 
+    @reviews = @book.reviews
   end
 
   # GET /reviews/1 or /reviews/1.json
@@ -432,7 +432,7 @@ The controller manages how information is passed from the view templates to the 
 Our view template revisions will involve changing the templates that relate to reviews, and also modifying our books `show` view, since we want users to see the reviews associated with particular books.
 
 Let's start with the foundational template for our reviews: the `form` partial that is reused across multiple review templates. Open that form now.
-  
+
 Rather than passing only the `review` model to the `form_with` form helper, we will pass both the `book` and `review` models, with `review` set as a child resource.
 
 Change the first line of the file to look like this, reflecting the relationship between our book and review resources:
@@ -449,7 +449,7 @@ The finished form, complete with our edits to the first line and without the del
 <figure><strong><code>app/views/reviews/_form.html.erb</code></strong></figure>
 
 ```erb
-<%= form_with(model: review) do |form| %>
+<%= form_with(model: [@book, review]) do |form| %>
   <% if review.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(review.errors.count, "error") %> prohibited this review from being saved:</h2>
@@ -473,7 +473,7 @@ The finished form, complete with our edits to the first line and without the del
 <% end %>
 ```
 Save and close the file when you are finished editing.
- 
+
 Next, open the `index` view, which will show the reviews associated with a particular book.
 
 Thanks to the `rails generate scaffold` command, Rails has generated the better part of the template, complete with a table that shows the `body` field of each review and its associated `book`.
@@ -649,7 +649,7 @@ Next, add a new redirect to allow users to add a new review for this particular 
 <%= link_to 'Edit', edit_book_path(@book) %> |
 <%= link_to 'Add Review', book_reviews_path(@book) %> |
 <%= link_to 'Back', books_path %>
-```  
+```
 Save and close the file when you are finished editing.
 
 You have now made changes to your application's models, controllers, and views to ensure that reviews are always associated with a particular book. As a final step, we can add some validations to our `Review` model to guarantee consistency in the data that's saved to the database.
@@ -688,15 +688,15 @@ The prerequisite Rails project tutorial walked you through adding and editing *A
 Click on *Show* next to the *A Walk in the Park* name. This will take you to the `show` view for this book. You will see the title of the book, it's description, and price, and a *Reviews* header with no content. Let's add a review to populate this part of the form.
 
 Click on *Add Review* below the *Review* header. This will bring you to the review `index` view, where you will have the chance to select *New Review*:
-![New Review](images/new-review.png)   
+![New Review](images/new-review.png)
 Thanks to the authentication mechanisms you put in place in [Step 6](./functionality.md) of Basic Functionality, you may be asked to authenticate with the username and password you created in that Step, depending on whether or not you have created a new session.
 
 Click on *New Review*, which will bring you to your review `new` template:
-![New Review](images/new-review.png) 
+![New Review](images/new-review.png)
 In the Body field, type, “This book is lovely!”
-![Add Review](images/create-review.png) 
+![Add Review](images/create-review.png)
 Click on *Create Review*. You will be redirected to the `index` view for all review that belong to this book:
-![Review Index](images/review-index.png) 
+![Review Index](images/review-index.png)
 With our review resources working, we can now test our data validations to ensure that only desired data gets saved to the database.
 
 From the index view, click on *New Review*. In the *Body* field of the new form, try entering “This book is lovely!” again:

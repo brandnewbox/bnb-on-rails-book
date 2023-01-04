@@ -20,7 +20,7 @@ In your new directory make a `docker-compose.yml` file and paste in:
 ```ruby
 version: "3"
 services:
-  app:    
+  app:
     image: brandnewbox/bnb-ruby:3.1-postgresql
     command: bundle exec puma -C config/puma.rb
     environment:
@@ -69,7 +69,7 @@ At the time of this writing, this will install Rail 7.0.4.
 
 cd ..
 gem install rails
-rails new bnb-library --database=postgresql
+rails new bnb-library --database=postgresql --javascript=webpack
 shopt -s dotglob nullglob
 mv bnb-library/* app
 exit
@@ -83,13 +83,13 @@ sudo chown -R $(whoami):$(whoami) * .git
 
 You will see a good deal of output telling you what Rails is creating for your new project. We are going to highlight some of the significant files, directories, and commands that you can find in the output of running `rails new`:
 
-- *gemfile* : This file lists the gem dependencies for your application. A gem is a Ruby software package, and a Gemfile allows you to manage your project's software needs. 
+- *gemfile* : This file lists the gem dependencies for your application. A gem is a Ruby software package, and a Gemfile allows you to manage your project's software needs.
 - *app*: The app directory is where your main application code lives. This includes the models, controllers, views, assets, helpers, and mailers that make up the application itself. Rails gives you some application-level boilerplate for the MCV model to start out in files like `app/models/application_record.rb`, `app/controllers/application_controller.rb`, and `app/views/layouts/application.html.erb`.
 - *config*: This directory contains your application's configuration settings.
 - *config/routes.rb*: Your application's route declarations live in this file.
-- *config/application.rb*: General settings for your application components are located in this file. 
-- *config/environments*: This directory is where configuration settings for your environments live. Rails includes three environments by default: `development`, `test`, and `production`. 
-- *config/database.yml*: Database configuration settings live in this file, which is broken into four sections: `default`, `development`, `production`, and `test`. Thanks to the Gemfile that came with the `rails new bnb-library --database=postgresql`, which included the `pg` gem, our `config/database.yml` file has its adapter parameter set to postgresql already, specifying that we will use an postgresql database with this application. 
+- *config/application.rb*: General settings for your application components are located in this file.
+- *config/environments*: This directory is where configuration settings for your environments live. Rails includes three environments by default: `development`, `test`, and `production`.
+- *config/database.yml*: Database configuration settings live in this file, which is broken into four sections: `default`, `development`, `production`, and `test`. Thanks to the Gemfile that came with the `rails new bnb-library --database=postgresql`, which included the `pg` gem, our `config/database.yml` file has its adapter parameter set to postgresql already, specifying that we will use an postgresql database with this application.
 - *db*: This folder includes a directory for database migrations called migrate, along with the `schema.rb` and `seeds.rb` files. `schema.db` contains information about your database, while `seeds.rb` is where you can place seed data for the database.
 
 ## Step 3 - Version Control
@@ -117,7 +117,7 @@ All we need to do is run the setup command. This will spin up an instance of the
 dip setup
 ```
 
-This will run all the commands in `bin/setup` that helps prepare your application. You can expect an output similar to 
+This will run all the commands in `bin/setup` that helps prepare your application. You can expect an output similar to
 
 ```
 == Installing dependencies ==
